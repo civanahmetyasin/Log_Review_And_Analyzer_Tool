@@ -15,3 +15,4 @@ Apart from its robust functionality in handling CSV files, this application is e
 
 By extending its capabilities beyond CSV files, this application stands as a versatile solution for various data analysis and visualization needs.
 
+![image](https://github.com/civanahmetyasin/Log_Review_And_Analyzer_Tool/assets/15190524/daafb60b-729b-4c11-a695-a0a47005a8da)
