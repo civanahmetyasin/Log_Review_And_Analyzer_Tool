@@ -359,8 +359,8 @@ class Window(QWidget):
         self.bHolder = 0
         self.lineCounter = 0
         self.titleList = []
-        self.colors = ['red', 'green', 'pink', 'purple',
-                       'orange', 'black', 'cyan', 'magenta']
+        self.colors = ['red', 'green', 'purple',
+                       'orange', 'black', 'cyan', 'magenta', 'yellow', 'brown', 'grey', 'olive', 'lime', 'teal', 'navy']
         self.pathCSV = ''
         self.ax_title = ''
         self.counter_for_flight_mode = 0
