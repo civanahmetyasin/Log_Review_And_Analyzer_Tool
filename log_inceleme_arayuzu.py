@@ -953,19 +953,23 @@ class Window(QWidget):
             if self.dataOneOn == True and self.dataTwoOn == True:            
                 try:
                     data = np.multiply(self.data_selected_one, self.data_selected_two)
-                except:
-                    # write exception message
-                    QMessageBox.about(self, "Error", "Multiple Line Error")
+                    self.dataOneOn = False
+                    self.dataTwoOn = False
+                    self.qButton.setStyleSheet(self.buttonStyle)
+                    self.multipleTwoLineCheckBox.setChecked(False)
+                    
+                    if self.multipleLineLabel.text() == '':
+                        self.multipleLineLabel.setText("Multiple Two Line")
+                    
+                    self.label_name = self.multipleLineLabel.text()
 
-                self.dataOneOn = False
-                self.dataTwoOn = False
-                self.qButton.setStyleSheet(self.buttonStyle)
-                
-                if self.multipleLineLabel.text() == '':
-                    self.multipleLineLabel.setText("Multiple Two Line")
-                
-                self.label_name = self.multipleLineLabel.text()
-                self.multipleTwoLineCheckBox.setChecked(False)
+                except:
+                    self.dataOneOn = False
+                    self.dataTwoOn = False
+                    self.multipleTwoLineCheckBox.setChecked(False)
+                    QMessageBox.about(self, "Error", "Multiple Line Error")
+                    return
+
 
         if (self.movingAverageCheckBox.isChecked() and not self.movingAveragePeriod.text().isdigit()) or (self.movingAverageCheckBox.isChecked() and self.movingAveragePeriod.text() == ''):
             msg = QMessageBox()
