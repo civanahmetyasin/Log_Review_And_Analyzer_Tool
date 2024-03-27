@@ -916,6 +916,7 @@ class Window(QWidget):
                         pass
 
         self.label_name = self.sender().text()
+        self.counter_for_flight_mode = 0
 
         if self.multipleTwoLineCheckBox.isChecked(): 
             if(self.dataOneOn == False):
@@ -943,12 +944,10 @@ class Window(QWidget):
                         border-color: #777;
                     }
                 """)
-                                
                 return
+                                
             elif(self.dataOneOn == True and self.dataTwoOn == False):
                 self.data_selected_two  = data
-                print(len(self.data_selected_two))
-                print(len(data))
                 self.dataTwoOn = True
 
             if self.dataOneOn == True and self.dataTwoOn == True:            
@@ -967,7 +966,6 @@ class Window(QWidget):
                 
                 self.label_name = self.multipleLineLabel.text()
 
-        self.counter_for_flight_mode = 0
         if (self.movingAverageCheckBox.isChecked() and not self.movingAveragePeriod.text().isdigit()) or (self.movingAverageCheckBox.isChecked() and self.movingAveragePeriod.text() == ''):
             msg = QMessageBox()
             msg.setText(
@@ -978,7 +976,6 @@ class Window(QWidget):
             self.movingAverageCheckBox.setChecked(False)
 
         if (self.drawOnTheSameGraphCheckBox.isChecked() or self.same_graph) and (self.lineCounter >= 1 and lineName == self.sender().text()):
-
             if self.yAxisTwinxCheckBox.isChecked():
                 self.ax2 = self.ax.twinx()
                 self.OnTheSameGraphCounter += 1
@@ -1056,7 +1053,6 @@ class Window(QWidget):
             self.titleList.append(title)
 
         else:
-
             if lineName == self.sender().text():
                 self.OnTheSameGraphCounter = 0
                 self.twinGraphCounter = 0
