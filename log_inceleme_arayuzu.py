@@ -45,6 +45,7 @@ class Window(QWidget):
         self.slipLineCharacter = ';'
 
         self.mathCalculationWidget = QWidget()
+        self.filterWidget = QWidget()
 
         # read file path from yaml file
         if os.path.exists('CSV_reader_Config/file_path.yaml'):
@@ -90,7 +91,7 @@ class Window(QWidget):
                             color: #6ECC78;
                             border-color: #777;}""")
         self.mathMenu.addAction('Math Calculation', self.mathCalculationWidget.show)
-        self.mathMenu.addAction('Filters', self.filter)
+        self.mathMenu.addAction('Filters', self.filterWidget.show)
 
         self.configMenu = self.menuBar.addMenu('Config')
         self.configMenu.setStyleSheet("""QMenu {background-color: #E1E1E1;
@@ -360,10 +361,17 @@ class Window(QWidget):
         self.lineCounter = 0
         self.titleList = []
         self.colors = ['red', 'green', 'purple',
-                       'orange', 'black', 'cyan', 'magenta', 'yellow', 'brown', 'grey', 'olive', 'lime', 'teal', 'navy']
+                       'orange', 'cyan', 'magenta', 'yellow', 'brown', 'grey', 'olive', 'lime', 'teal', 'navy', 'black']
         self.pathCSV = ''
         self.ax_title = ''
         self.counter_for_flight_mode = 0
+
+        self.data_selected_one = []
+        self.data_selected_two = []
+        self.dataOneOn = False
+        self.dataTwoOn = False
+        self.buttonStyle = """"""
+        self.qButton = QPushButton()
 
         self.rawDataWidget = QWidget()
 
@@ -372,6 +380,12 @@ class Window(QWidget):
         self.mathCalculationWidget.resize(250, 150)
         self.mathCalculationWidget.move(10, 30)
         self.mathCalculationWidget.show()
+
+        self.filterWidget.setWindowTitle("Filter")
+        self.filterWidget.resize(250, 150)
+        self.filterWidget.move(10, 400)
+        self.filterWidget.show()
+        
 
         self.lineEditStyle = """
                 QLineEdit {
@@ -461,6 +475,30 @@ class Window(QWidget):
         self.startEndPointCheckBox.setChecked(False)
         self.startEndPointCheckBox.setStyleSheet(self.checkboxStyle)
 
+        # add separator line
+        self.line5 = QWidget()
+        self.line5.setFixedHeight(1)
+        self.line5.setStyleSheet("""
+                    background-color: black;
+                    color: black;
+                    border: none;
+                    padding: 3px;
+                    margin: 2px;
+                    """)
+        
+        # multiple line new label
+        self.multipleLineLabel = QLineEdit()
+        self.multipleLineLabel.setPlaceholderText('Enter Multiple Line Label')
+        self.multipleLineLabel.setStyleSheet(self.lineEditStyle)
+        
+
+        # add multiple two line checkbox
+        self.multipleTwoLineCheckBox = QCheckBox('Multiple Two Line')
+        self.multipleTwoLineCheckBox.setChecked(False)
+        self.multipleTwoLineCheckBox.setStyleSheet(self.checkboxStyle)
+        
+
+
         self.mathCalculationLayout = QVBoxLayout()
         self.mathCalculationLayout.addWidget(self.mathCalculationTextBox)
         self.mathCalculationLayout.addWidget(self.plusCheckBox)
@@ -471,8 +509,28 @@ class Window(QWidget):
         self.mathCalculationLayout.addWidget(self.startPoint)
         self.mathCalculationLayout.addWidget(self.endPoint)
         self.mathCalculationLayout.addWidget(self.startEndPointCheckBox)
+        self.mathCalculationLayout.addWidget(self.line5)
+        self.mathCalculationLayout.addWidget(self.multipleLineLabel)
+        self.mathCalculationLayout.addWidget(self.multipleTwoLineCheckBox)   
         self.mathCalculationWidget.setLayout(self.mathCalculationLayout)
         self.mathCalculationWidget.setWindowIcon(QtGui.QIcon('icon.ico'))
+
+        self.movingAverageCheckBox = QCheckBox('Moving Average')
+        self.movingAverageCheckBox.setChecked(False)
+        self.movingAverageCheckBox.setStyleSheet(self.checkboxStyle)
+
+        self.movingAveragePeriod = QLineEdit()
+        self.movingAveragePeriod.setPlaceholderText('Period')
+        self.movingAveragePeriod.setStyleSheet(self.lineEditStyle)
+        self.movingAveragePeriod.setValidator(QtGui.QIntValidator())
+        
+
+        self.filterLayout = QVBoxLayout()
+        self.filterLayout.addWidget(self.movingAveragePeriod)
+        self.filterLayout.addWidget(self.movingAverageCheckBox)
+        self.filterWidget.setLayout(self.filterLayout)
+        self.filterWidget.setWindowIcon(QtGui.QIcon('icon.ico'))
+
 
     def search(self):
         search_text = self.searchField.text()
@@ -512,8 +570,8 @@ class Window(QWidget):
     def help(self):
         QMessageBox.about(self, "Help", " if mouse right click on the title, draw on the same graph\n\n if you want to see FFT graph, you must enter sample rate\n\n if you want to see mean value on the graph, you must check mean on checkbox\n\n if you want to open raw data in table, you must check open raw data in table checkbox\n\n if you want to use start and end point, you must check use start and end point checkbox\n\n if you want to use math calculation, you must enter number and check + - * / checkbox")
 
-    def filter(self):
-        QMessageBox.about(self, "Filters", "Coming Soon \n\n like this: \n\n low pass filter \n\n high pass filter \n\n band pass filter \n\n band stop filter \n\n")
+    # def filter(self):
+        # QMessageBox.about(self, "Filters", "Coming Soon \n\n like this: \n\n low pass filter \n\n high pass filter \n\n band pass filter \n\n band stop filter \n\n")
 
      
     def setSeparator(self):
@@ -719,7 +777,7 @@ class Window(QWidget):
     def draw_line_graph(self, lines, column, doesHaveFmode, lineName):
         # read data from csv file
         data = []
-
+        
         if not doesHaveFmode:
             for i in range(len(lines)):
                 if i != 0:
@@ -834,7 +892,7 @@ class Window(QWidget):
                                         point = point / \
                                             float(
                                                 self.mathCalculationTextBox.text())
-                                    data.append(point)
+                                    data.append(point)                        
                             else:
                                 if self.plusCheckBox.isChecked():
                                     point = point + \
@@ -856,7 +914,69 @@ class Window(QWidget):
 
                     except:
                         pass
+
+        self.label_name = self.sender().text()
+
+        if self.multipleTwoLineCheckBox.isChecked(): 
+            if(self.dataOneOn == False):
+                self.data_selected_one = data
+                self.dataOneOn = True
+                self.buttonStyle = self.sender().styleSheet()
+                self.qButton = self.sender()
+               
+                #change color selection button
+                self.sender().setStyleSheet("""
+                    QPushButton {
+                        background-color: #6ECC78;
+                        color: black;
+                        border-style: solid;
+                        border-width: 1px;
+                        border-color: #1E1E1E;
+                        border-radius: 10px;
+                        font: bold 14px;
+                        padding: 3px;
+                        margin: 2px;
+                    }
+                    QPushButton:hover {
+                        background-color: #1E1E1E;
+                        color: #6ECC78;
+                        border-color: #777;
+                    }
+                """)
+                                
+                return
+            elif(self.dataOneOn == True and self.dataTwoOn == False):
+                self.data_selected_two  = data
+                print(len(self.data_selected_two))
+                print(len(data))
+                self.dataTwoOn = True
+
+            if self.dataOneOn == True and self.dataTwoOn == True:            
+                try:
+                    data = np.multiply(self.data_selected_one, self.data_selected_two)
+                except:
+                    # write exception message
+                    QMessageBox.about(self, "Error", "Multiple Line Error")
+
+                self.dataOneOn = False
+                self.dataTwoOn = False
+                self.qButton.setStyleSheet(self.buttonStyle)
+                
+                if self.multipleLineLabel.text() == '':
+                    self.multipleLineLabel.setText("Multiple Two Line")
+                
+                self.label_name = self.multipleLineLabel.text()
+
         self.counter_for_flight_mode = 0
+        if (self.movingAverageCheckBox.isChecked() and not self.movingAveragePeriod.text().isdigit()) or (self.movingAverageCheckBox.isChecked() and self.movingAveragePeriod.text() == ''):
+            msg = QMessageBox()
+            msg.setText(
+                "If you want to see Moving Average graph, you must enter period!")
+            msg.setWindowTitle("Error")
+            msg.setIcon(QMessageBox.Icon.Warning)
+            msg.exec()
+            self.movingAverageCheckBox.setChecked(False)
+
         if (self.drawOnTheSameGraphCheckBox.isChecked() or self.same_graph) and (self.lineCounter >= 1 and lineName == self.sender().text()):
 
             if self.yAxisTwinxCheckBox.isChecked():
@@ -864,11 +984,11 @@ class Window(QWidget):
                 self.OnTheSameGraphCounter += 1
                 self.twinGraphCounter += 1
 
-                self.ax2.plot(data, label=self.sender().text(),
+                self.ax2.plot(data, label=self.label_name,
                               linewidth=1.0, color=self.colors[self.lineCounter % len(self.colors)])
 
                 # write label under to the line
-                self.ax2.annotate(self.sender().text(), xy=(-10, data[0]), xytext=(
+                self.ax2.annotate(self.label_name, xy=(-10, data[0]), xytext=(
                     -10, data[0] - 0.1), color=self.colors[self.lineCounter % len(self.colors)])
 
                 # write label on the line
@@ -876,13 +996,22 @@ class Window(QWidget):
                 if self.meanCheckBox.isChecked():
                     mean_value = np.mean(data)
 
-                    meanLabel = self.sender().text() + \
+                    meanLabel = self.label_name + \
                         f' Mean: {mean_value:.2f} '
 
                     self.ax2.axhline(y=mean_value, color=self.colors[self.lineCounter % len(self.colors)],
                                      linestyle='--', label=meanLabel)
+                
+                if self.movingAverageCheckBox.isChecked():
+                    moving_average_data = np.convolve(data, np.ones(int(self.movingAveragePeriod.text()))/int(self.movingAveragePeriod.text()), mode='valid')
+                    movingAverageLabel = self.label_name + ' Moving Average'
+                    try:
+                        self.ax.plot(moving_average_data, label=movingAverageLabel ,
+                                  linestyle='--', color='black')
+                    except:
+                        QMessageBox.about(self, "Error", "Moving Average Error")
 
-                self.ax2.set_ylabel(self.sender().text(), color=self.colors[self.lineCounter % len(
+                self.ax2.set_ylabel(self.label_name, color=self.colors[self.lineCounter % len(
                     self.colors)], labelpad=10 * self.OnTheSameGraphCounter)
 
                 self.ax2.tick_params(
@@ -892,21 +1021,29 @@ class Window(QWidget):
             else:
                 self.OnTheSameGraphCounter += 1
 
-                self.ax.plot(data, label=self.sender().text(
-                ), linewidth=1, color=self.colors[self.lineCounter % len(self.colors)])
+                self.ax.plot(data, label=self.label_name, linewidth=1, color=self.colors[self.lineCounter % len(self.colors)])
 
                 if self.meanCheckBox.isChecked():
                     mean_value = np.mean(data)
 
-                    meanLabel = self.sender().text() + \
+                    meanLabel = self.label_name + \
                         f' Mean: {mean_value:.2f} '
 
                     self.ax.axhline(y=mean_value, color=self.colors[self.lineCounter % len(self.colors)],
                                     linestyle='--', label=meanLabel)
+                
+                if self.movingAverageCheckBox.isChecked():
+                    moving_average_data = np.convolve(data, np.ones(int(self.movingAveragePeriod.text()))/int(self.movingAveragePeriod.text()), mode='valid')
+                    movingAverageLabel = self.label_name + ' Moving Average'
+                    try:
+                        self.ax.plot(moving_average_data, label=movingAverageLabel,
+                                  linestyle='--', color='black')
+                    except:
+                        QMessageBox.about(self, "Error", "Moving Average Error")
 
                 self.ax.legend(loc='upper left')
 
-                self.ax_title = self.ax_title + ", " + self.sender().text()
+                self.ax_title = self.ax_title + ", " + self.label_name
 
                 self.ax.set_title(self.ax_title)
                 plt.get_current_fig_manager().set_window_title(
@@ -926,13 +1063,13 @@ class Window(QWidget):
 
                 self.fig, self.ax = plt.subplots()
 
-                self.ax.set_title(self.sender().text())
+                self.ax.set_title(self.label_name)
 
                 self.fig.canvas.mpl_connect(
                     'close_event', self.close_fig_event)
 
                 self.ax.plot(
-                    data, label=self.sender().text(), linewidth=1, color='blue')
+                    data, label=self.label_name, linewidth=1, color='blue')
                 self.ax.grid(True)
                 self.ax.set_xlabel('Sample number')
                 self.ax.set_ylabel('Value')
@@ -940,11 +1077,20 @@ class Window(QWidget):
                 if self.meanCheckBox.isChecked():
                     mean_value = np.mean(data)
 
-                    meanLabel = self.sender().text() + \
+                    meanLabel = self.label_name + \
                         f' Mean: {mean_value:.2f} '
 
                     self.ax.axhline(y=mean_value, color='blue',
                                     linestyle='--', label=meanLabel)
+
+                if self.movingAverageCheckBox.isChecked():
+                    moving_average_data = np.convolve(data, np.ones(int(self.movingAveragePeriod.text()))/int(self.movingAveragePeriod.text()), mode='valid')
+                    movingAverageLabel = self.label_name + ' Moving Average'
+                    try:
+                        self.ax.plot(moving_average_data, label=movingAverageLabel ,
+                                  linestyle='--', color='black')
+                    except:
+                        QMessageBox.about(self, "Error", "Moving Average Error")
 
                 self.ax.legend(loc='upper left')
 
@@ -997,7 +1143,7 @@ class Window(QWidget):
                 self.tableColumnCounter = 0
                 self.rawDataWidget = QWidget()
                 self.rawDataWidget.setWindowTitle(
-                    self.sender().text() + " Raw Data")
+                    self.label_name + " Raw Data")
                 self.rawDataWidget.resize(500, 500)
                 self.rawDataWidget.show()
                 self.layout = QVBoxLayout()
@@ -1007,7 +1153,7 @@ class Window(QWidget):
                 self.table.setRowCount(len(data))
 
                 # print to console as uint16_t c array without .0
-                # print("uint16_t " + self.sender().text() + "[] = {")
+                # print("uint16_t " + self.label_name + "[] = {")
                 # for i in range(len(data)):
                 #     if i == len(data)-1:
                 #         print(str(int(data[i])))
@@ -1020,7 +1166,7 @@ class Window(QWidget):
                     self.table.setItem(i, 0, QTableWidgetItem(str(data[i])))
 
                 # set table header
-                self.table.setHorizontalHeaderLabels([self.sender().text()])
+                self.table.setHorizontalHeaderLabels([self.label_name])
 
                 self.layout.addWidget(self.table)
                 self.rawDataWidget.setLayout(self.layout)
@@ -1029,7 +1175,7 @@ class Window(QWidget):
                     self.tableColumnCounter = 0
                     self.rawDataWidget = QWidget()
                     self.rawDataWidget.setWindowTitle(
-                        self.sender().text() + " Raw Data")
+                        self.label_name + " Raw Data")
                     self.rawDataWidget.resize(500, 500)
                     self.rawDataWidget.show()
                     self.layout = QVBoxLayout()
@@ -1038,7 +1184,7 @@ class Window(QWidget):
                     self.table.setRowCount(len(data))
 
                     # print to console as uint16_t c array without .0
-                    # print("uint16_t " + self.sender().text() + "[] = {")
+                    # print("uint16_t " + self.label_name + "[] = {")
                     # for i in range(len(data)):
                     #     if i == len(data)-1:
                     #         print(str(int(data[i])))
@@ -1053,7 +1199,7 @@ class Window(QWidget):
 
                     # set table header
                     self.table.setHorizontalHeaderLabels(
-                        [self.sender().text()])
+                        [self.label_name])
 
                     self.layout.addWidget(self.table)
                     self.rawDataWidget.setLayout(self.layout)
@@ -1065,7 +1211,7 @@ class Window(QWidget):
                     self.table.setRowCount(len(data))
 
                     # print to console as uint16_t c array without .0
-                    # print("uint16_t " + self.sender().text() + "[] = {")
+                    # print("uint16_t " + self.label_name + "[] = {")
                     # for i in range(len(data)):
                     #     if i == len(data)-1:
                     #         print(str(int(data[i])))
@@ -1079,7 +1225,7 @@ class Window(QWidget):
                                            QTableWidgetItem(str(data[i])))
                     # set column header name as line name
                     self.table.setHorizontalHeaderItem(
-                        self.tableColumnCounter, QTableWidgetItem(self.sender().text()))
+                        self.tableColumnCounter, QTableWidgetItem(self.label_name))
 
         self.lineCounter += 1
 
