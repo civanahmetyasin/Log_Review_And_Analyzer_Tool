@@ -383,7 +383,7 @@ class Window(QWidget):
 
         self.filterWidget.setWindowTitle("Filter")
         self.filterWidget.resize(250, 150)
-        self.filterWidget.move(10, 400)
+        self.filterWidget.move(10, 450)
         self.filterWidget.show()
         
 
@@ -965,6 +965,7 @@ class Window(QWidget):
                     self.multipleLineLabel.setText("Multiple Two Line")
                 
                 self.label_name = self.multipleLineLabel.text()
+                self.multipleTwoLineCheckBox.setChecked(False)
 
         if (self.movingAverageCheckBox.isChecked() and not self.movingAveragePeriod.text().isdigit()) or (self.movingAverageCheckBox.isChecked() and self.movingAveragePeriod.text() == ''):
             msg = QMessageBox()
@@ -1001,7 +1002,7 @@ class Window(QWidget):
                 
                 if self.movingAverageCheckBox.isChecked():
                     moving_average_data = np.convolve(data, np.ones(int(self.movingAveragePeriod.text()))/int(self.movingAveragePeriod.text()), mode='valid')
-                    movingAverageLabel = self.label_name + ' Moving Average'
+                    movingAverageLabel = self.label_name + ' Moving Average' + ', Period: ' + self.movingAveragePeriod.text()
                     try:
                         self.ax.plot(moving_average_data, label=movingAverageLabel ,
                                   linestyle='--', color='black')
@@ -1031,7 +1032,7 @@ class Window(QWidget):
                 
                 if self.movingAverageCheckBox.isChecked():
                     moving_average_data = np.convolve(data, np.ones(int(self.movingAveragePeriod.text()))/int(self.movingAveragePeriod.text()), mode='valid')
-                    movingAverageLabel = self.label_name + ' Moving Average'
+                    movingAverageLabel = self.label_name + ' Moving Average' + ', Period: ' + self.movingAveragePeriod.text()
                     try:
                         self.ax.plot(moving_average_data, label=movingAverageLabel,
                                   linestyle='--', color='black')
@@ -1081,7 +1082,7 @@ class Window(QWidget):
 
                 if self.movingAverageCheckBox.isChecked():
                     moving_average_data = np.convolve(data, np.ones(int(self.movingAveragePeriod.text()))/int(self.movingAveragePeriod.text()), mode='valid')
-                    movingAverageLabel = self.label_name + ' Moving Average'
+                    movingAverageLabel = self.label_name + ' Moving Average' + ', Period: ' + self.movingAveragePeriod.text()
                     try:
                         self.ax.plot(moving_average_data, label=movingAverageLabel ,
                                   linestyle='--', color='black')
