@@ -57,70 +57,39 @@ class Window(QWidget):
         self.setWindowTitle('CSV Reader V' + self.version)
         self.setWindowIcon(QtGui.QIcon('icon.ico'))
         self.setGeometry(300, 50, 400, 400)
+
+        menuStyle = """QMenu {background-color: #E1E1E1;
+                            color: black;
+                            border-style: solid;
+                            border-width: 1px;
+                            border-color: #1E1E1E;
+                            border-radius: 10px;
+                            font: bold 14px;
+                            padding: 3px;
+                            margin: 2px;}
+                            QMenu::item:selected {background-color: #1E1E1E;
+                            color: #6ECC78;
+                            border-color: #777;}"""
         
         # add qmenu
         self.menuBar = QMenuBar()
         self.menuBar.setNativeMenuBar(False)
         self.fileMenu = self.menuBar.addMenu('File')
-        self.fileMenu.setStyleSheet("""QMenu {background-color: #E1E1E1;
-                            color: black;
-                            border-style: solid;
-                            border-width: 1px;
-                            border-color: #1E1E1E;
-                            border-radius: 10px;
-                            font: bold 14px;
-                            padding: 3px;
-                            margin: 2px;}
-                            QMenu::item:selected {background-color: #1E1E1E;
-                            color: #6ECC78;
-                            border-color: #777;}""")
+        self.fileMenu.setStyleSheet(menuStyle)
         self.fileMenu.addAction('Open CSV File', self.read_csv)
         self.fileMenu.addAction('Exit', self.close)
 
         self.mathMenu = self.menuBar.addMenu('Math')
-        self.mathMenu.setStyleSheet("""QMenu {background-color: #E1E1E1;
-                            color: black;
-                            border-style: solid;
-                            border-width: 1px;
-                            border-color: #1E1E1E;
-                            border-radius: 10px;
-                            font: bold 14px;
-                            padding: 3px;
-                            margin: 2px;}
-                            QMenu::item:selected {background-color: #1E1E1E;
-                            color: #6ECC78;
-                            border-color: #777;}""")
+        self.mathMenu.setStyleSheet(menuStyle)
         self.mathMenu.addAction('Math Calculation', self.mathCalculationWidget.show)
         self.mathMenu.addAction('Filters', self.filterWidget.show)
 
         self.configMenu = self.menuBar.addMenu('Config')
-        self.configMenu.setStyleSheet("""QMenu {background-color: #E1E1E1;
-                            color: black;
-                            border-style: solid;
-                            border-width: 1px;
-                            border-color: #1E1E1E;
-                            border-radius: 10px;
-                            font: bold 14px;
-                            padding: 3px;
-                            margin: 2px;}
-                            QMenu::item:selected {background-color: #1E1E1E;
-                            color: #6ECC78;
-                            border-color: #777;}""")
+        self.configMenu.setStyleSheet(menuStyle)
         self.configMenu.addAction('Set Separator', self.setSeparator)
 
         self.helpMenu = self.menuBar.addMenu('Help')
-        self.helpMenu.setStyleSheet("""QMenu {background-color: #E1E1E1;
-                            color: black;
-                            border-style: solid;
-                            border-width: 1px;
-                            border-color: #1E1E1E;
-                            border-radius: 10px;
-                            font: bold 14px;
-                            padding: 3px;
-                            margin: 2px;}
-                            QMenu::item:selected {background-color: #1E1E1E;
-                            color: #6ECC78;
-                            border-color: #777;}""")
+        self.helpMenu.setStyleSheet(menuStyle)
         self.helpMenu.addAction('About', self.about)
         self.helpMenu.addAction('Help', self.help)
         self.helpMenu.addAction('Thanks', self.thanks)
@@ -147,11 +116,7 @@ class Window(QWidget):
                             border-color: #777;
                         }
                     """)
-
-        # add draw on the same graph checkbox
-        self.drawOnTheSameGraphCheckBox = QCheckBox('Draw On the Same Graph')
-        self.drawOnTheSameGraphCheckBox.setChecked(False)
-        self.drawOnTheSameGraphCheckBox.setStyleSheet("""
+        self.checkboxStyle = """
                 QCheckBox {
                     background-color: #E1E1E1;
                     color: black;
@@ -169,68 +134,9 @@ class Window(QWidget):
                     width: 13px;
                     height: 13px;
                 }
-            """)
-
-        # add y axis twinx checkbox
-        self.yAxisTwinxCheckBox = QCheckBox('Y Axis Twinx')
-        self.yAxisTwinxCheckBox.setChecked(False)
-        self.yAxisTwinxCheckBox.setStyleSheet("""
-                QCheckBox {
-                    background-color: #E1E1E1;
-                    color: black;
-                    border: none;
-                    font: bold 14px;
-                    padding: 3px;
-                    margin: 2px;
-                }
-                QCheckBox:hover {
-                    background-color: #1E1E1E;
-                    color: #6ECC78;
-                    border-color: #777;
-                }
-                QCheckBox::indicator {
-                    width: 13px;
-                    height: 13px;
-                }
-            """)
-
-        # add separate line
-        self.line2 = QWidget()
-        self.line2.setFixedHeight(1)
-        self.line2.setStyleSheet('background-color: black')
-
-        self.fftCheckBox = QCheckBox('FFT on')
-        self.fftCheckBox.setChecked(False)
-        self.fftCheckBox.stateChanged.connect(self.fftCheckBoxChanged)
-        self.fftCheckBox.setStyleSheet("""
-                QCheckBox {
-                    background-color: #E1E1E1;
-                    color: black;
-                    border: none;
-                    font: bold 14px;
-                    padding: 3px;
-                    margin: 2px;
-                }
-                QCheckBox:hover {
-                    background-color: #1E1E1E;
-                    color: #6ECC78;
-                    border-color: #777;
-                }
-                QCheckBox::indicator {
-                    width: 13px;
-                    height: 13px;
-                }
-            """)
-
-        # add separate line
-        self.line3 = QWidget()
-        self.line3.setFixedHeight(1)
-        self.line3.setStyleSheet('background-color: black')
-
-        self.fftFrequency = QLineEdit()
-        self.fftFrequency.setPlaceholderText('Sample Frequency')
-        self.fftFrequency.setDisabled(True)
-        self.fftFrequency.setStyleSheet("""
+            """
+        
+        self.lineEditStyle = """
                 QLineEdit {
                     background-color: #E6E6E6;
                     color: #808080;
@@ -251,29 +157,40 @@ class Window(QWidget):
                     color: black;
                     border: 2px solid #777;
                 }
-            """)
+            """
+        # add draw on the same graph checkbox
+        self.drawOnTheSameGraphCheckBox = QCheckBox('Draw On the Same Graph')
+        self.drawOnTheSameGraphCheckBox.setChecked(False)
+        self.drawOnTheSameGraphCheckBox.setStyleSheet(self.checkboxStyle)
+
+        # add y axis twinx checkbox
+        self.yAxisTwinxCheckBox = QCheckBox('Y Axis Twinx')
+        self.yAxisTwinxCheckBox.setChecked(False)
+        self.yAxisTwinxCheckBox.setStyleSheet(self.checkboxStyle)
+
+        # add separate line
+        self.line2 = QWidget()
+        self.line2.setFixedHeight(1)
+        self.line2.setStyleSheet('background-color: black')
+
+        self.fftCheckBox = QCheckBox('FFT on')
+        self.fftCheckBox.setChecked(False)
+        self.fftCheckBox.stateChanged.connect(self.fftCheckBoxChanged)
+        self.fftCheckBox.setStyleSheet(self.checkboxStyle)
+
+        # add separate line
+        self.line3 = QWidget()
+        self.line3.setFixedHeight(1)
+        self.line3.setStyleSheet('background-color: black')
+
+        self.fftFrequency = QLineEdit()
+        self.fftFrequency.setPlaceholderText('Sample Frequency')
+        self.fftFrequency.setDisabled(True)
+        self.fftFrequency.setStyleSheet(self.lineEditStyle)
 
         self.openRawData = QCheckBox('Open Raw Data In Table')
         self.openRawData.setChecked(False)
-        self.openRawData.setStyleSheet("""
-                QCheckBox {
-                    background-color: #E1E1E1;
-                    color: black;
-                    border: none;
-                    font: bold 14px;
-                    padding: 3px;
-                    margin: 2px;
-                }
-                QCheckBox:hover {
-                    background-color: #1E1E1E;
-                    color: #6ECC78;
-                    border-color: #777;
-                }
-                QCheckBox::indicator {
-                    width: 13px;
-                    height: 13px;
-                }
-            """)
+        self.openRawData.setStyleSheet(self.checkboxStyle)
 
         # add separator line
         self.line = QWidget()
@@ -289,53 +206,14 @@ class Window(QWidget):
         # add mean on the same graph checkbox
         self.meanCheckBox = QCheckBox('Mean On')
         self.meanCheckBox.setChecked(False)
-        self.meanCheckBox.setStyleSheet("""
-                QCheckBox {
-                    background-color: #E1E1E1;
-                    color: black;
-                    border: none;
-                    font: bold 14px;
-                    padding: 3px;
-                    margin: 2px;
-                }
-                QCheckBox:hover {
-                    background-color: #1E1E1E;
-                    color: #6ECC78;
-                    border-color: #777;
-                }
-                QCheckBox::indicator {
-                    width: 13px;
-                    height: 13px;
-                }
-            """)
+        self.meanCheckBox.setStyleSheet(self.checkboxStyle)
 
         self.searchField = QLineEdit()
         self.searchField.setPlaceholderText('Search')
         self.searchField.returnPressed.connect(self.search)
         self.searchField.textChanged.connect(self.search)
         self.searchField.setDisabled(True)
-        self.searchField.setStyleSheet("""
-                QLineEdit {
-                    background-color: #E6E6E6;
-                    color: #808080;
-                    border-style: solid;
-                    border-width: 1px;
-                    border-color: #1E1E1E;
-                    border-radius: 5px;
-                    font: bold 14px;
-                    padding: 3px;
-                    margin: 2px;
-                }
-                QLineEdit:hover {
-                    background-color: #FAFAFA;
-                    color: black;
-                }
-                QLineEdit:focus {
-                    background-color: #FAFAFA;
-                    color: black;
-                    border: 2px solid #777;
-                }
-            """)
+        self.searchField.setStyleSheet(self.lineEditStyle)
 
         self.layout = QVBoxLayout()
         self.layout.addWidget(self.button)
@@ -385,57 +263,13 @@ class Window(QWidget):
         self.filterWidget.resize(250, 150)
         self.filterWidget.move(10, 450)
         self.filterWidget.show()
-        
 
-        self.lineEditStyle = """
-                QLineEdit {
-                    background-color: #E6E6E6;
-                    color: #808080;
-                    border-style: solid;
-                    border-width: 1px;
-                    border-color: #1E1E1E;
-                    border-radius: 5px;
-                    font: bold 14px;
-                    padding: 3px;
-                    margin: 2px;
-                }
-                QLineEdit:hover {
-                    background-color: #FAFAFA;
-                    color: black;
-                }
-                QLineEdit:focus {
-                    background-color: #FAFAFA;
-                    color: black;
-                    border: 2px solid #777;
-                }
-            """
         # add textbox for get number for math calculation
         self.mathCalculationTextBox = QLineEdit()
         self.mathCalculationTextBox.setPlaceholderText('Enter Number')
         self.mathCalculationTextBox.setStyleSheet(self.lineEditStyle)
-        self.mathCalculationTextBox.setValidator(QtGui.QDoubleValidator())
+        self.mathCalculationTextBox.setValidator(QtGui.QDoubleValidator().setNotation(QtGui.QDoubleValidator.Notation.StandardNotation))
 
-        # add + - * / checkbox
-        # checkbox style
-        self.checkboxStyle = """
-                QCheckBox {
-                    background-color: #E1E1E1;
-                    color: black;
-                    border: none;
-                    font: bold 14px;
-                    padding: 3px;
-                    margin: 2px;
-                }
-                QCheckBox:hover {
-                    background-color: #1E1E1E;
-                    color: #6ECC78;
-                    border-color: #777;
-                }
-                QCheckBox::indicator {
-                    width: 13px;
-                    height: 13px;
-                }
-            """
         self.plusCheckBox = QCheckBox('+')
         self.plusCheckBox.setChecked(False)
         self.plusCheckBox.setStyleSheet(self.checkboxStyle)
@@ -777,7 +611,23 @@ class Window(QWidget):
     def draw_line_graph(self, lines, column, doesHaveFmode, lineName):
         # read data from csv file
         data = []
-        
+        point = 0.0
+
+        if  self.plusCheckBox.isChecked() or self.minusCheckBox.isChecked() or self.multiplyCheckBox.isChecked() or self.divideCheckBox.isChecked():
+            self.mathCalculationTextBox.setText(self.mathCalculationTextBox.text().replace(',', '.'))
+            if self.mathCalculationTextBox.text().replace('.', '', 1).isdigit() and self.mathCalculationTextBox.text() != '':
+                pass
+            else:
+                self.mathCalculationTextBox.setText('')
+                # set message box
+                msg = QMessageBox()
+                msg.setText("Math Calculation is not valid")
+                msg.setWindowTitle("Error")
+                msg.setIcon(QMessageBox.Icon.Warning)
+                msg.exec()
+                return
+
+
         if not doesHaveFmode:
             for i in range(len(lines)):
                 if i != 0:
@@ -1257,28 +1107,7 @@ class Window(QWidget):
             """)
         else:
             self.fftFrequency.setEnabled(False)
-            self.fftFrequency.setStyleSheet("""
-                QLineEdit {
-                    background-color: #E6E6E6;
-                    color: #808080;
-                    border-style: solid;
-                    border-width: 1px;
-                    border-color: #1E1E1E;
-                    border-radius: 5px;
-                    font: bold 14px;
-                    padding: 3px;
-                    margin: 2px;
-                }
-                QLineEdit:hover {
-                    background-color: #FAFAFA;
-                    color: black;
-                }
-                QLineEdit:focus {
-                    background-color: #FAFAFA;
-                    color: black;
-                    border: 2px solid #777;
-                }
-            """)
+            self.fftFrequency.setStyleSheet(self.lineEditStyle)
 
     def close_fig_event(self, event):
         counter = 0
