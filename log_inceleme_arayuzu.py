@@ -260,8 +260,8 @@ class Window(QWidget):
         self.mathCalculationWidget.show()
 
         self.filterWidget.setWindowTitle("Filter")
-        self.filterWidget.resize(250, 150)
-        self.filterWidget.move(10, 450)
+        self.filterWidget.resize(250, 100)
+        self.filterWidget.move(10, 460)
         self.filterWidget.show()
 
         # add textbox for get number for math calculation
@@ -1116,6 +1116,36 @@ class Window(QWidget):
                 self.titleList.pop(counter)
                 self.lineCounter = 0
             counter = counter + 1
+    
+    # add keyboard event for shortcut
+    def keyPressEvent(self, event):
+        super().keyPressEvent(event)
+
+        if event.key() == Qt.Key.Key_Escape:
+            self.mathCalculationWidget.close()
+            self.filterWidget.close()
+        if event.key() == Qt.Key.Key_Y:
+            self.yAxisTwinxCheckBox.setChecked(True)
+        if event.key() == Qt.Key.Key_D:
+            self.drawOnTheSameGraphCheckBox.setChecked(not self.drawOnTheSameGraphCheckBox.isChecked())
+        if event.key() == Qt.Key.Key_F:
+            self.fftCheckBox.setChecked(not self.fftCheckBox.isChecked())
+        if event.key() == Qt.Key.Key_M:
+            self.meanCheckBox.setChecked(not self.meanCheckBox.isChecked())
+        if event.key() == Qt.Key.Key_R:
+            self.openRawData.setChecked(not self.openRawData.isChecked())
+        if event.key() == Qt.Key.Key_S:
+            self.startEndPointCheckBox.setChecked(not self.startEndPointCheckBox.isChecked())
+        if event.key() == Qt.Key.Key_P:
+            self.plusCheckBox.setChecked(not self.plusCheckBox.isChecked())
+    
+    def keyReleaseEvent(self, event):
+        super().keyReleaseEvent(event)
+        if event.key() == Qt.Key.Key_Y:
+            self.yAxisTwinxCheckBox.setChecked(False)
+
+            
+
 
 
 if __name__ == "__main__":
