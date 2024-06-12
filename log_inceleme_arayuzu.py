@@ -1,6 +1,6 @@
 # read csv file
 from PyQt6 import QtGui
-from PyQt6.QtWidgets import QFileDialog,  QWidget, QApplication, QMessageBox, QLineEdit, QPushButton, QVBoxLayout, QScrollArea, QCheckBox, QTableWidget, QTableWidgetItem, QMenuBar, QInputDialog
+from PyQt6.QtWidgets import QFileDialog, QAbstractItemView, QHeaderView, QWidget, QApplication, QMessageBox, QLineEdit, QPushButton, QVBoxLayout, QScrollArea, QCheckBox, QTableWidget, QTableWidgetItem, QMenuBar, QInputDialog
 import matplotlib.pyplot as plt
 import os
 import sys
@@ -46,13 +46,16 @@ class Window(QWidget):
 
         self.mathCalculationWidget = QWidget()
         self.filterWidget = QWidget()
+        self.reviewNoteWidget = QWidget()
 
         # read file path from yaml file
         if os.path.exists('CSV_reader_Config/file_path.yaml'):
             with open('CSV_reader_Config/file_path.yaml', 'r') as f:
                 self.pathCSV = yaml.load(f, Loader=yaml.FullLoader)
+        
+        self.selectedPath = ''
                 
-        self.version = "1.7.0"
+        self.version = "5.0.0"
 
         self.setWindowTitle('CSV Reader V' + self.version)
         self.setWindowIcon(QtGui.QIcon('icon.ico'))
@@ -70,6 +73,27 @@ class Window(QWidget):
                             QMenu::item:selected {background-color: #1E1E1E;
                             color: #6ECC78;
                             border-color: #777;}"""
+        buttonStyle = """QPushButton {
+                            background-color: #E1E1E1;
+                            color: black;
+                            border-style: solid;
+                            border-width: 1px;
+                            border-color: #1E1E1E;
+                            border-radius: 10px;
+                            font: bold 14px;
+                            padding: 3px;
+                            margin: 2px;
+                        }
+                        QPushButton:hover {
+                            background-color: #1E1E1E;
+                            color: #6ECC78;
+                            border-color: #777;
+                        QPushButton:pressed {
+                            background-color: #6ECC78;
+                            color: black;
+                            border-color: #1E1E1E;
+                        }}
+                        """
         
         # add qmenu
         self.menuBar = QMenuBar()
@@ -87,6 +111,7 @@ class Window(QWidget):
         self.configMenu = self.menuBar.addMenu('Config')
         self.configMenu.setStyleSheet(menuStyle)
         self.configMenu.addAction('Set Separator', self.setSeparator)
+        self.configMenu.addAction('Review Note', self.reviewNoteWidget.show)
 
         self.helpMenu = self.menuBar.addMenu('Help')
         self.helpMenu.setStyleSheet(menuStyle)
@@ -94,28 +119,10 @@ class Window(QWidget):
         self.helpMenu.addAction('Help', self.help)
         self.helpMenu.addAction('Thanks', self.thanks)
 
-
-
         self.button = QPushButton('Open CSV file')
         self.button.clicked.connect(self.read_csv)
-        self.button.setStyleSheet("""
-                        QPushButton {
-                            background-color: #E1E1E1;
-                            color: black;
-                            border-style: solid;
-                            border-width: 1px;
-                            border-color: #1E1E1E;
-                            border-radius: 10px;
-                            font: bold 14px;
-                            padding: 3px;
-                            margin: 2px;
-                        }
-                        QPushButton:hover {
-                            background-color: #1E1E1E;
-                            color: #6ECC78;
-                            border-color: #777;
-                        }
-                    """)
+        self.button.setStyleSheet(buttonStyle)
+
         self.checkboxStyle = """
                 QCheckBox {
                     background-color: #E1E1E1;
@@ -248,7 +255,6 @@ class Window(QWidget):
         self.data_selected_two = []
         self.dataOneOn = False
         self.dataTwoOn = False
-        self.buttonStyle = """"""
         self.qButton = QPushButton()
 
         self.rawDataWidget = QWidget()
@@ -264,6 +270,12 @@ class Window(QWidget):
         self.filterWidget.move(10, 460)
         self.filterWidget.show()
 
+        # add log review note
+        self.reviewNoteWidget.setWindowTitle("Note Review")
+        self.reviewNoteWidget.resize(250, 300)
+        self.reviewNoteWidget.move(10, 600)
+        self.reviewNoteWidget.show()
+        
         # add textbox for get number for math calculation
         self.mathCalculationTextBox = QLineEdit()
         self.mathCalculationTextBox.setPlaceholderText('Enter Number')
@@ -330,8 +342,6 @@ class Window(QWidget):
         self.multipleTwoLineCheckBox = QCheckBox('Multiple Two Line')
         self.multipleTwoLineCheckBox.setChecked(False)
         self.multipleTwoLineCheckBox.setStyleSheet(self.checkboxStyle)
-        
-
 
         self.mathCalculationLayout = QVBoxLayout()
         self.mathCalculationLayout.addWidget(self.mathCalculationTextBox)
@@ -364,6 +374,28 @@ class Window(QWidget):
         self.filterLayout.addWidget(self.movingAverageCheckBox)
         self.filterWidget.setLayout(self.filterLayout)
         self.filterWidget.setWindowIcon(QtGui.QIcon('icon.ico'))
+
+
+        self.reviewNoteSaveButton = QPushButton('Save')
+        self.reviewNoteSaveButton.setStyleSheet(buttonStyle)
+        self.reviewNoteSaveButton.clicked.connect(self.review_note_save)
+        
+        self.reviewNoteRichtextBox = QTableWidget()
+        self.reviewNoteRichtextBox.setColumnCount(1)
+        self.reviewNoteRichtextBox.setHorizontalHeaderLabels(["Review Notes"])
+        self.reviewNoteRichtextBox.setRowCount(100)
+        self.reviewNoteRichtextBox.setItem(0, 0, QTableWidgetItem(''))
+        self.reviewNoteRichtextBox.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        self.reviewNoteRichtextBox.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+
+        self.reviewNoteLayout = QVBoxLayout()
+        self.reviewNoteLayout.addWidget(self.reviewNoteSaveButton)
+        self.reviewNoteLayout.addWidget(self.reviewNoteRichtextBox)
+        self.reviewNoteWidget.setLayout(self.reviewNoteLayout)
+        self.reviewNoteWidget.setWindowIcon(QtGui.QIcon('icon.ico'))
+
+
+
 
 
     def search(self):
@@ -419,8 +451,12 @@ class Window(QWidget):
 
 
     def read_csv(self):
-
-        # clear buttons for new csv file not include read csv file button,
+        
+        # clear table   
+        self.reviewNoteRichtextBox.clearContents()
+        self.reviewNoteRichtextBox.setRowCount(100)
+        self.reviewNoteRichtextBox.setItem(0, 0, QTableWidgetItem(''))
+        
 
         if self.layout.count() > 11:
             for i in reversed(range(11, self.layout.count())):
@@ -435,6 +471,8 @@ class Window(QWidget):
 
         file_name = QFileDialog.getOpenFileName(
             self, 'Open file', self.pathCSV, 'CSV files (*.csv);;All files (*.*)')[0]
+        self.selectedPath = file_name
+
 
         newTitle = file_name.split("/")
         self.CSV_file_name = newTitle[len(newTitle)-1]
@@ -547,12 +585,90 @@ class Window(QWidget):
                 self.scrollbar.widget().layout().addWidget(self.titleButton)
 
                 button_count += 1
+                
+                # add review notes to table from yaml file
+                        #split file name
+                newTitle = self.CSV_file_name.split(".")
+                yaml_file_name = newTitle[0]
+                
+                #split path
+                rawPath = self.selectedPath.split("/")
+
+                for i in range(0, len(rawPath)-1):
+                    if i == 0:
+                        path = rawPath[i]
+                    else:
+                        path = path + '/' + rawPath[i]
+                
+                if os.path.exists(path + '/' + yaml_file_name + '.yaml'):
+                    with open(path + '/' + yaml_file_name + '.yaml', 'r') as f:
+                        review_note = yaml.load(f, Loader=yaml.FullLoader)
+                        for key, value in review_note.items():
+                            self.reviewNoteRichtextBox.setItem(key, 0, QTableWidgetItem(value))
+                                            
+                
 
         else:
             # change window size
             self.resize(300, 300)
             self.searchField.setDisabled(True)
             QMessageBox.warning(self, 'Error', 'No file selected')
+
+    def review_note_save(self):
+        
+        if self.selectedPath == '':
+            QMessageBox.warning(self, 'Error', 'No file selected')
+            return
+
+        if self.CSV_file_name == '':
+            QMessageBox.warning(self, 'Error', 'No file selected')
+            return
+
+        if self.reviewNoteRichtextBox.item(0, 0) == None:
+            QMessageBox.warning(self, 'Error', 'No review note')
+            return
+        
+ 
+        review_note = {}
+        counter = 0
+
+        for i in range(0, 100):
+            # get review note from table
+            if self.reviewNoteRichtextBox.item(i, 0) != None:
+                review_note[counter] = self.reviewNoteRichtextBox.item(i, 0).text()
+                counter += 1
+            
+        #split file name
+        newTitle = self.CSV_file_name.split(".cs")
+        yaml_file_name = newTitle[0]
+        
+        #split path
+        rawPath = self.selectedPath.split("/")
+
+        for i in range(0, len(rawPath)-1):
+            if i == 0:
+                path = rawPath[i]
+            else:
+                path = path + '/' + rawPath[i]        
+                
+        if not os.path.exists(path + '/' + yaml_file_name+ '.yaml'):
+            print('not exist')
+            print(path + '/' + yaml_file_name + '.yaml')
+            with open(path + '/' + yaml_file_name + '.yaml', 'w') as f:
+                yaml.dump(review_note, f)
+        else:
+            print('exist')
+            print(path + '/' + yaml_file_name + '.yaml')
+            with open(path + '/' + yaml_file_name + '.yaml', 'a') as f:
+                #clear file
+                f.seek(0)
+                f.truncate()
+                yaml.dump(review_note, f)
+
+        QMessageBox.about(self, "Review Note", "Review Saved")        
+        
+        
+
 
     def show_title(self, mouseEvent):
 
@@ -1124,6 +1240,7 @@ class Window(QWidget):
         if event.key() == Qt.Key.Key_Escape:
             self.mathCalculationWidget.close()
             self.filterWidget.close()
+            self.reviewNoteWidget.close()
         if event.key() == Qt.Key.Key_Y:
             self.yAxisTwinxCheckBox.setChecked(True)
         if event.key() == Qt.Key.Key_D:
@@ -1151,7 +1268,7 @@ class Window(QWidget):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = Window()
-    window.setWindowTitle("Log Inceleme Arayuzu V4.1")
+    window.setWindowTitle("Log Inceleme Arayuzu V5.0")
     window.resize(300, 300)
     window.show()
     sys.exit(app.exec())
