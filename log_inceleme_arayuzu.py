@@ -56,6 +56,7 @@ class Window(QWidget):
         self.selectedPath = ''
                 
         self.version = "5.0.0"
+        self.CppArrayData = ""
 
         self.setWindowTitle('CSV Reader V' + self.version)
         self.setWindowIcon(QtGui.QIcon('icon.ico'))
@@ -1114,19 +1115,25 @@ class Window(QWidget):
                 self.rawDataWidget.resize(500, 500)
                 self.rawDataWidget.show()
                 self.layout = QVBoxLayout()
+                
+                self.exportButton = QPushButton( self.label_name + ' ' + 'Export as Cpp Array' )
+                
+                # print to console as uint16_t c array without .0
+                self.CppArrayData = "uint16_t " + self.label_name + "[] = {"
+                for i in range(len(data)):
+                    if i == len(data)-1:
+                        self.CppArrayData = self.CppArrayData + str(int(data[i]))
+                    else:
+                        self.CppArrayData = self.CppArrayData + str(int(data[i])) + ", "
+                self.CppArrayData = self.CppArrayData + "};"
+
+                self.exportButton.clicked.connect(self.export_as_cpp_array)
+                self.layout.addWidget(self.exportButton)
+
                 self.table = QTableWidget()
 
                 self.table.setColumnCount(1)
                 self.table.setRowCount(len(data))
-
-                # print to console as uint16_t c array without .0
-                # print("uint16_t " + self.label_name + "[] = {")
-                # for i in range(len(data)):
-                #     if i == len(data)-1:
-                #         print(str(int(data[i])))
-                #     else:
-                #         print(str(int(data[i])) + ",")
-                # print("};")
 
                 # add data to table
                 for i in range(len(data)):
@@ -1150,15 +1157,6 @@ class Window(QWidget):
                     self.table.setColumnCount(1)
                     self.table.setRowCount(len(data))
 
-                    # print to console as uint16_t c array without .0
-                    # print("uint16_t " + self.label_name + "[] = {")
-                    # for i in range(len(data)):
-                    #     if i == len(data)-1:
-                    #         print(str(int(data[i])))
-                    #     else:
-                    #         print(str(int(data[i])) + ",")
-                    # print("};")
-
                     # add data to table
                     for i in range(len(data)):
                         self.table.setItem(
@@ -1176,15 +1174,6 @@ class Window(QWidget):
                     # if draw on the same graph, add same table as column
                     self.table.setColumnCount(self.tableColumnCounter + 1)
                     self.table.setRowCount(len(data))
-
-                    # print to console as uint16_t c array without .0
-                    # print("uint16_t " + self.label_name + "[] = {")
-                    # for i in range(len(data)):
-                    #     if i == len(data)-1:
-                    #         print(str(int(data[i])))
-                    #     else:
-                    #         print(str(int(data[i])) + ",")
-                    # print("};")
 
                     # add data to table
                     for i in range(len(data)):
@@ -1260,11 +1249,49 @@ class Window(QWidget):
         super().keyReleaseEvent(event)
         if event.key() == Qt.Key.Key_Y:
             self.yAxisTwinxCheckBox.setChecked(False)
+    
+    def export_as_cpp_array(self):
+        # print to .cpp file as uint16_t c array without .0
+        if self.selectedPath == '':
+            QMessageBox.warning(self, 'Error', 'No file selected')
+            return
+        
+        if self.CSV_file_name == '':
+            QMessageBox.warning(self, 'Error', 'No file selected')
+            return
+        
+        if self.label_name == '':
+            QMessageBox.warning(self, 'Error', 'No label name')
+            return
+        
+        if self.CppArrayData == '':
+            QMessageBox.warning(self, 'Error', 'No data')
+            return
+        
+        
+        # export self.CppArrayData to .cpp file
 
-            
-
-
-
+        #split file name
+        newTitle = self.CSV_file_name.split(".cs")
+        yaml_file_name = newTitle[0]
+        
+        #split path
+        rawPath = self.selectedPath.split("/")
+        for i in range(0, len(rawPath)-1):
+            if i == 0:
+                path = rawPath[i]
+            else:
+                path = path + '/' + rawPath[i]
+        
+        if not os.path.exists(path + '/' + yaml_file_name + '.cpp'):
+            with open(path + '/' + yaml_file_name + '_Raw_Data_Array' + '.cpp', 'w') as f:
+                f.write(self.CppArrayData)
+        else:
+            with open(path + '/' + yaml_file_name + '_Raw_Data_Array' + '.cpp', 'a') as f:
+                f.write(self.CppArrayData)
+        
+        QMessageBox.about(self, "Export as Cpp Array", "Exported as Cpp Array")
+        
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = Window()
