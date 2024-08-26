@@ -55,7 +55,7 @@ class Window(QWidget):
         
         self.selectedPath = ''
                 
-        self.version = "5.0.0"
+        self.version = "5.5.0"
         self.CppArrayData = ""
 
         self.setWindowTitle('CSV Reader V' + self.version)
@@ -1295,7 +1295,7 @@ class Window(QWidget):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = Window()
-    window.setWindowTitle("Log Inceleme Arayuzu V5.0")
+    window.setWindowTitle("Log Inceleme Arayuzu V5.5")
     window.resize(300, 300)
     window.show()
     sys.exit(app.exec())
