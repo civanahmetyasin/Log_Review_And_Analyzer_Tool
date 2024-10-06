@@ -1299,6 +1299,7 @@ class Window(QWidget):
                 number = float(number)
             
             conditionalData = []
+            conditionalData.append(data[0])
 
             # check checkbox is checked or not
             if self.lessThanCheckBox.isChecked():
