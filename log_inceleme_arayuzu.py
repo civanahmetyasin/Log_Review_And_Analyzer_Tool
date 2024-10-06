@@ -435,9 +435,31 @@ class Window(QWidget):
 
         # number textbox for conditional analysis
         self.conditionalAnalysisTextBox = QLineEdit()
-        self.conditionalAnalysisTextBox.setPlaceholderText('Enter Number')
+        self.conditionalAnalysisTextBox.setPlaceholderText('Enter Number For Conditional Analysis')
         self.conditionalAnalysisTextBox.setStyleSheet(self.lineEditStyle)
         self.conditionalAnalysisTextBox.setValidator(QtGui.QDoubleValidator().setNotation(QtGui.QDoubleValidator.Notation.StandardNotation))
+        
+        # add separator line
+        self.line6 = QWidget()
+        self.line6.setFixedHeight(1)
+        self.line6.setStyleSheet("""
+                    background-color: black;
+                    color: black;
+                    border: none;
+                    padding: 3px;
+                    margin: 2px;
+                    """)
+        
+        # add Delta Threshold Detection number textbox
+        self.deltaThresholdDetectionTextBox = QLineEdit()
+        self.deltaThresholdDetectionTextBox.setPlaceholderText('Enter Number For Delta Threshold Detection')
+        self.deltaThresholdDetectionTextBox.setStyleSheet(self.lineEditStyle)
+        self.deltaThresholdDetectionTextBox.setValidator(QtGui.QDoubleValidator().setNotation(QtGui.QDoubleValidator.Notation.StandardNotation))
+        
+        # add Delta Threshold Detection button
+        self.deltaThresholdDetectionCheckBox = QCheckBox('Delta Threshold Detection')
+        self.deltaThresholdDetectionCheckBox.setChecked(False)
+        self.deltaThresholdDetectionCheckBox.setStyleSheet(self.checkboxStyle)
         
 
         # Layout ayarı
@@ -448,6 +470,10 @@ class Window(QWidget):
         self.conditionalAnalysisLayout.addWidget(self.lessThanEqualCheckBox)
         self.conditionalAnalysisLayout.addWidget(self.greaterThanEqualCheckBox)
         self.conditionalAnalysisLayout.addWidget(self.equalCheckBox)
+        self.conditionalAnalysisLayout.addWidget(self.line6)
+        self.conditionalAnalysisLayout.addWidget(self.deltaThresholdDetectionTextBox)
+        self.conditionalAnalysisLayout.addWidget(self.deltaThresholdDetectionCheckBox)
+        
 
         self.conditionalAnalysisWidget.setLayout(self.conditionalAnalysisLayout)
         self.conditionalAnalysisWidget.setWindowIcon(QtGui.QIcon('icon.ico'))
@@ -1350,10 +1376,59 @@ class Window(QWidget):
             self.table.setHorizontalHeaderLabels([self.label_name])
             self.layout.addWidget(self.table)
             self.rawDataWidget.setLayout(self.layout)
+        
+        if self.deltaThresholdDetectionTextBox.text() == '' and self.deltaThresholdDetectionCheckBox.isChecked():
+            msg = QMessageBox()
+            msg.setText(
+                "If you want to use delta threshold detection, you must enter number!")
+            msg.setWindowTitle("Error")
+            msg.setIcon(QMessageBox.Icon.Warning)
+            msg.exec()
             
+        
+        if self.deltaThresholdDetectionCheckBox.isChecked() and self.deltaThresholdDetectionTextBox.text() != '':
+            # get number from line edit
+            number = self.deltaThresholdDetectionTextBox.text()
+            number = number.replace(',', '.')
             
+            if number.isdigit():
+                number = int(number)
+            else:
+                number = float(number)
             
-                            
+            deltaData = []
+            deltaData.append(data[0])
+            
+            for i in range(1, len(data)):
+                if abs(data[i] - data[i-1]) > number:
+                    deltaData.append(data[i])
+            
+            msg = QMessageBox()
+            msg.setText(
+                f"Detected {len(deltaData)} data is greater than {number}")
+            msg.setWindowTitle("Delta Threshold Detection")
+            msg.setIcon(QMessageBox.Icon.Information)
+            msg.exec()
+            
+            # new table for delta threshold detection
+            self.rawDataWidget = QWidget()
+            self.rawDataWidget.setWindowTitle(
+                self.label_name + " Delta Threshold Detection")
+            self.rawDataWidget.resize(500, 500)
+            self.rawDataWidget.show()
+            self.layout = QVBoxLayout()
+            self.table = QTableWidget()
+            self.table.setColumnCount(1)
+            self.table.setRowCount(len(deltaData))
+            
+            # add data to table
+            for i in range(len(deltaData)):
+                self.table.setItem(i, 0, QTableWidgetItem(str(deltaData[i])))
+            
+            # set table header
+            self.table.setHorizontalHeaderLabels([self.label_name])
+            self.layout.addWidget(self.table)
+            self.rawDataWidget.setLayout(self.layout)                    
         
         self.lineCounter += 1
 
