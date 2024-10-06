@@ -1518,6 +1518,95 @@ class Window(QWidget):
                 self.layout.addWidget(self.table)
                 self.rawDataWidget.setLayout(self.layout)                    
         
+        if self.programmerAnalysisTextBox.text() == '' and self.andCheckBox.isChecked() and self.orCheckBox.isChecked():
+            msg = QMessageBox()
+            msg.setText(
+                "If you want to use programmer analysis, you must enter number!")
+            msg.setWindowTitle("Error")
+            msg.setIcon(QMessageBox.Icon.Warning)
+            msg.exec()
+        
+        if self.programmerAnalysisTextBox.text() != '' and (self.andCheckBox.isChecked() or self.orCheckBox.isChecked()):
+            # get hex number from line edit
+            number = self.programmerAnalysisTextBox.text()
+            
+            if '0x' in number:
+                number = number.replace('0x', '')
+
+                if all(c in '0123456789ABCDEFabcdef' for c in number):
+                    number = int(number, 16)  
+                else:
+                    msg = QMessageBox()
+                    msg.setText(
+                        "If you want to use programmer analysis, you must enter a valid hex number!")
+                    msg.setWindowTitle("Error")
+                    msg.setIcon(QMessageBox.Icon.Warning)
+                    msg.exec()
+                    return
+            else:
+                if number.isdigit():
+                    number = int(number)  
+                else:
+                    msg = QMessageBox()
+                    msg.setText(
+                        "If you want to use programmer analysis, you must enter a valid decimal or hex number!")
+                    msg.setWindowTitle("Error")
+                    msg.setIcon(QMessageBox.Icon.Warning)
+                    msg.exec()
+                    return
+            
+            bitwiseData = []
+            sampleNumberData = []
+            
+            if self.andCheckBox.isChecked():
+                for i in range(len(data)):
+                    bitwiseData.append(int(data[i]) & number)
+                    sampleNumberData.append(i)
+                    
+
+            if self.orCheckBox.isChecked():
+                for i in range(len(data)):
+                    bitwiseData.append(int(data[i]) | number)
+                    sampleNumberData.append(i)
+            
+            if len(bitwiseData) > 0  and len(sampleNumberData) > 0:
+                # new table for programmer analysis
+                self.rawDataWidget = QWidget()
+                self.rawDataWidget.setWindowTitle(
+                    self.label_name + " Programmer Analysis")
+                self.rawDataWidget.resize(500, 500)
+                self.rawDataWidget.show()
+                self.layout = QVBoxLayout()
+                self.table = QTableWidget()
+                self.table.setColumnCount(4)
+                self.table.setRowCount(len(sampleNumberData))
+                self.table.setHorizontalHeaderLabels(['Sample Number', 'Sample Value' + ' ' + self.label_name, 'Bitwise Value', 'Binary Value'])
+                
+                # add data to table
+                for i in range(len(sampleNumberData)):
+                    self.table.setItem(i, 0, QTableWidgetItem(str(sampleNumberData[i])))
+                    self.table.setItem(i, 1, QTableWidgetItem(str(data[i])))
+                    self.table.setItem(i, 2, QTableWidgetItem(hex(int(bitwiseData[i]))))
+                    self.table.setItem(i, 3, QTableWidgetItem(bin(int(bitwiseData[i]))))
+                    
+                    
+
+                
+                # add information lable for programmer analysis
+                self.programmerAnalysisLabel = QLabel()
+                self.programmerAnalysisLabel.setText(f"Detected {len(sampleNumberData)} data is detected")
+                
+                # add about button for programmer analysis
+                self.programmerAnalysisAbout = QPushButton("About")
+                self.programmerAnalysisAbout.clicked.connect(self.programmer_analysis_about)
+                
+                self.layout.addWidget(self.programmerAnalysisLabel)
+                self.layout.addWidget(self.programmerAnalysisAbout)
+                self.layout.addWidget(self.table)
+                self.rawDataWidget.setLayout(self.layout)
+            
+        
+        
         self.lineCounter += 1
 
     def fftCheckBoxChanged(self):
@@ -1666,7 +1755,20 @@ class Window(QWidget):
         msg.setWindowTitle("Conditional Analysis")
         msg.setIcon(QMessageBox.Icon.Information)
         msg.exec()
-            
+     
+    def programmer_analysis_about(self):
+        # show about message box for programmer analysis
+        msg = QMessageBox()
+        msg.setText(
+            "Programmer Analysis is a method that performs bitwise operations on the data."
+            "\n\n Sample Number: Detected sample number"
+            "\n Sample Value: Detected sample value"
+            "\n\n Formula: data[i] & number, data[i] | number")
+        
+        msg.setWindowTitle("Programmer Analysis")
+        msg.setIcon(QMessageBox.Icon.Information)
+        msg.exec()
+               
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = Window()
