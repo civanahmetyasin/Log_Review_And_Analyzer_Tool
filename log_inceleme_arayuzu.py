@@ -1299,13 +1299,14 @@ class Window(QWidget):
                 number = float(number)
             
             conditionalData = []
-            conditionalData.append(data[0])
+            sampleNumberData = []
 
             # check checkbox is checked or not
             if self.lessThanCheckBox.isChecked():
                 for i in range(len(data)):
                     if data[i] < number:
                         conditionalData.append(data[i])
+                        sampleNumberData.append(i)
                 msg = QMessageBox()
                 msg.setText(
                     f"Detected {len(conditionalData)} data is less than {number}")
@@ -1317,6 +1318,7 @@ class Window(QWidget):
                 for i in range(len(data)):
                     if data[i] > number:
                         conditionalData.append(data[i])
+                        sampleNumberData.append(i)
                 msg = QMessageBox()
                 msg.setText(
                     f"Detected {len(conditionalData)} data is greater than {number}")
@@ -1328,6 +1330,7 @@ class Window(QWidget):
                 for i in range(len(data)):
                     if data[i] <= number:
                         conditionalData.append(data[i])
+                        sampleNumberData.append(i)
                 msg = QMessageBox()
                 msg.setText(
                     f"Detected {len(conditionalData)} data is less than or equal to {number}")
@@ -1339,7 +1342,8 @@ class Window(QWidget):
                 for i in range(len(data)):
                     if data[i] >= number:
                         conditionalData.append(data[i])
-                msg = QMessageBox()
+                        sampleNumberData.append(i)
+                        msg = QMessageBox()
                 msg.setText(
                     f"Detected {len(conditionalData)} data is greater than or equal to {number}")
                 msg.setWindowTitle("Conditional Analysis")
@@ -1350,7 +1354,8 @@ class Window(QWidget):
                 for i in range(len(data)):
                     if data[i] == number:
                         conditionalData.append(data[i])
-                msg = QMessageBox()
+                        sampleNumberData.append(i)
+                        msg = QMessageBox()
                 msg.setText(
                     f"Detected {len(conditionalData)} data is equal to {number}")
                 msg.setWindowTitle("Conditional Analysis")
@@ -1366,15 +1371,16 @@ class Window(QWidget):
             self.rawDataWidget.show()
             self.layout = QVBoxLayout()
             self.table = QTableWidget()
-            self.table.setColumnCount(1)
+            self.table.setColumnCount(2)
             self.table.setRowCount(len(conditionalData))
+            self.table.setHorizontalHeaderLabels(['Sample Number', 'Sample Value' + ' ' + self.label_name])
             
             # add data to table
             for i in range(len(conditionalData)):
-                self.table.setItem(i, 0, QTableWidgetItem(str(conditionalData[i])))
+                self.table.setItem(i, 0, QTableWidgetItem(str(sampleNumberData[i])))
+                self.table.setItem(i, 1, QTableWidgetItem(str(conditionalData[i])))
             
             # set table header
-            self.table.setHorizontalHeaderLabels([self.label_name])
             self.layout.addWidget(self.table)
             self.rawDataWidget.setLayout(self.layout)
         
