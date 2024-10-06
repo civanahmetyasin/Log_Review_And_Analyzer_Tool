@@ -1397,11 +1397,14 @@ class Window(QWidget):
                 number = float(number)
             
             deltaData = []
-            deltaData.append(data[0])
-            
+            sampleNumberData = []
+
+            # jump first data            
             for i in range(1, len(data)):
+
                 if abs(data[i] - data[i-1]) > number:
                     deltaData.append(data[i])
+                    sampleNumberData.append(i)
             
             msg = QMessageBox()
             msg.setText(
@@ -1410,25 +1413,28 @@ class Window(QWidget):
             msg.setIcon(QMessageBox.Icon.Information)
             msg.exec()
             
-            # new table for delta threshold detection
-            self.rawDataWidget = QWidget()
-            self.rawDataWidget.setWindowTitle(
-                self.label_name + " Delta Threshold Detection")
-            self.rawDataWidget.resize(500, 500)
-            self.rawDataWidget.show()
-            self.layout = QVBoxLayout()
-            self.table = QTableWidget()
-            self.table.setColumnCount(1)
-            self.table.setRowCount(len(deltaData))
+            if len(deltaData) > 0 and len(sampleNumberData) > 0 :
+                # new table for delta threshold detection
+                self.rawDataWidget = QWidget()
+                self.rawDataWidget.setWindowTitle(
+                    self.label_name + " Delta Threshold Detection")
+                self.rawDataWidget.resize(500, 500)
+                self.rawDataWidget.show()
+                self.layout = QVBoxLayout()
+                self.table = QTableWidget()
+                self.table.setColumnCount(2)
+                self.table.setRowCount(len(deltaData))
+                self.table.setHorizontalHeaderLabels(['Sample Number', 'Delta Value'])
+                                    
+                # add data to table
+                for i in range(len(deltaData)):
+                    self.table.setItem(i, 1, QTableWidgetItem(str(sampleNumberData[i])))
+                    self.table.setItem(i, 0, QTableWidgetItem(str(deltaData[i])))
             
-            # add data to table
-            for i in range(len(deltaData)):
-                self.table.setItem(i, 0, QTableWidgetItem(str(deltaData[i])))
-            
-            # set table header
-            self.table.setHorizontalHeaderLabels([self.label_name])
-            self.layout.addWidget(self.table)
-            self.rawDataWidget.setLayout(self.layout)                    
+                # set table header
+                self.table.setHorizontalHeaderLabels([self.label_name])
+                self.layout.addWidget(self.table)
+                self.rawDataWidget.setLayout(self.layout)                    
         
         self.lineCounter += 1
 
