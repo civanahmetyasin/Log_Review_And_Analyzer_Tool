@@ -1390,52 +1390,60 @@ class Window(QWidget):
                     if data[i] == number:
                         conditionalData.append(data[i])
                         sampleNumberData.append(i)
-
-            # new table for conditional analysis
-            self.rawDataWidget = QWidget()
-            self.rawDataWidget.setWindowTitle(
-                self.label_name + " Conditional Analysis")
-            self.rawDataWidget.resize(500, 500)
-            self.rawDataWidget.show()
-            self.layout = QVBoxLayout()
-            self.table = QTableWidget()
-            self.table.setColumnCount(2)
-            self.table.setRowCount(len(conditionalData))
-            self.table.setHorizontalHeaderLabels(['Sample Number', 'Sample Value' + ' ' + self.label_name])
             
-            # add information lable for conditional analysis
-            self.conditionalAnalysisLabel = QLabel()
-            self.conditionalAnalysisLabel.setText(f"Detected {len(conditionalData)} data is detected")
-            
-            # add max value to table
-            self.maxValue = QLabel()
-            self.maxValue.setText(f"Max Value: {max(conditionalData)}" + ', ' + 'Sample Number: ' + str(sampleNumberData[conditionalData.index(max(conditionalData))]))
-            
-            # add min value to table
-            self.minValue = QLabel()
-            self.minValue.setText(f"Min Value: {min(conditionalData)}" + ', ' + 'Sample Number: ' + str(sampleNumberData[conditionalData.index(min(conditionalData))]))
-            
-            # add mean value to table
-            self.meanValue = QLabel()
-            self.meanValue.setText(f"Mean Value: {np.mean(conditionalData):.3f}")
-            
-            # add about button for conditional analysis
-            self.conditionalAnalysisAbout = QPushButton("About")
-            self.conditionalAnalysisAbout.clicked.connect(self.conditional_analysis_about)
-            
-            # add data to table
-            for i in range(len(conditionalData)):
-                self.table.setItem(i, 0, QTableWidgetItem(str(sampleNumberData[i])))
-                self.table.setItem(i, 1, QTableWidgetItem(str(conditionalData[i])))
-            
-            # set table header
-            self.layout.addWidget(self.conditionalAnalysisLabel)
-            self.layout.addWidget(self.maxValue)
-            self.layout.addWidget(self.minValue)
-            self.layout.addWidget(self.meanValue)
-            self.layout.addWidget(self.conditionalAnalysisAbout)
-            self.layout.addWidget(self.table)
-            self.rawDataWidget.setLayout(self.layout)
+            if len(conditionalData) == 0 and len(sampleNumberData) == 0:
+                msg = QMessageBox()
+                msg.setText(
+                    "There is no data detected with conditional analysis!")
+                msg.setWindowTitle("Error")
+                msg.setIcon(QMessageBox.Icon.Warning)
+                msg.exec()
+            else:           
+                # new table for conditional analysis
+                self.rawDataWidget = QWidget()
+                self.rawDataWidget.setWindowTitle(
+                    self.label_name + " Conditional Analysis")
+                self.rawDataWidget.resize(500, 500)
+                self.rawDataWidget.show()
+                self.layout = QVBoxLayout()
+                self.table = QTableWidget()
+                self.table.setColumnCount(2)
+                self.table.setRowCount(len(conditionalData))
+                self.table.setHorizontalHeaderLabels(['Sample Number', 'Sample Value' + ' ' + self.label_name])
+                
+                # add information lable for conditional analysis
+                self.conditionalAnalysisLabel = QLabel()
+                self.conditionalAnalysisLabel.setText(f"Detected {len(conditionalData)} data is detected")
+                
+                # add max value to table
+                self.maxValue = QLabel()
+                self.maxValue.setText(f"Max Value: {max(conditionalData)}" + ', ' + 'Sample Number: ' + str(sampleNumberData[conditionalData.index(max(conditionalData))]))
+                
+                # add min value to table
+                self.minValue = QLabel()
+                self.minValue.setText(f"Min Value: {min(conditionalData)}" + ', ' + 'Sample Number: ' + str(sampleNumberData[conditionalData.index(min(conditionalData))]))
+                
+                # add mean value to table
+                self.meanValue = QLabel()
+                self.meanValue.setText(f"Mean Value: {np.mean(conditionalData):.3f}")
+                
+                # add about button for conditional analysis
+                self.conditionalAnalysisAbout = QPushButton("About")
+                self.conditionalAnalysisAbout.clicked.connect(self.conditional_analysis_about)
+                
+                # add data to table
+                for i in range(len(conditionalData)):
+                    self.table.setItem(i, 0, QTableWidgetItem(str(sampleNumberData[i])))
+                    self.table.setItem(i, 1, QTableWidgetItem(str(conditionalData[i])))
+                
+                # set table header
+                self.layout.addWidget(self.conditionalAnalysisLabel)
+                self.layout.addWidget(self.maxValue)
+                self.layout.addWidget(self.minValue)
+                self.layout.addWidget(self.meanValue)
+                self.layout.addWidget(self.conditionalAnalysisAbout)
+                self.layout.addWidget(self.table)
+                self.rawDataWidget.setLayout(self.layout)
         
         if self.deltaThresholdDetectionTextBox.text() == '' and self.deltaThresholdDetectionCheckBox.isChecked():
             msg = QMessageBox()
