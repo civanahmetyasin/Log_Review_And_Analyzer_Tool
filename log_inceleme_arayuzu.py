@@ -49,6 +49,8 @@ class Window(QWidget):
         self.mathCalculationWidget = QWidget()
         self.filterWidget = QWidget()
         self.reviewNoteWidget = QWidget()
+        self.conditionalAnalysisWidget = QWidget()
+    
 
         # read file path from yaml file
         if os.path.exists('CSV_reader_Config/file_path.yaml'):
@@ -279,6 +281,13 @@ class Window(QWidget):
         self.reviewNoteWidget.move(10, 600)
         self.reviewNoteWidget.show()
         
+        # add conditional analysis
+        self.conditionalAnalysisWidget.setWindowTitle("Conditional Analysis")
+        self.conditionalAnalysisWidget.resize(250, 300)
+        self.conditionalAnalysisWidget.move(610, 30)
+        self.conditionalAnalysisWidget.show()
+    
+        
         # add textbox for get number for math calculation
         self.mathCalculationTextBox = QLineEdit()
         self.mathCalculationTextBox.setPlaceholderText('Enter Number')
@@ -396,6 +405,41 @@ class Window(QWidget):
         self.reviewNoteLayout.addWidget(self.reviewNoteRichtextBox)
         self.reviewNoteWidget.setLayout(self.reviewNoteLayout)
         self.reviewNoteWidget.setWindowIcon(QtGui.QIcon('icon.ico'))
+        
+        # add  "<", ">", "<=", ">=", "=" checkbox for conditional analysis
+        self.lessThanCheckBox = QCheckBox('<')
+        self.lessThanCheckBox.setChecked(False)
+        self.lessThanCheckBox.setStyleSheet(self.checkboxStyle)
+        self.greaterThanCheckBox = QCheckBox('>')
+        self.greaterThanCheckBox.setChecked(False)
+        self.greaterThanCheckBox.setStyleSheet(self.checkboxStyle)
+        self.lessThanEqualCheckBox = QCheckBox('<=')
+        self.lessThanEqualCheckBox.setChecked(False)
+        self.lessThanEqualCheckBox.setStyleSheet(self.checkboxStyle)
+        self.greaterThanEqualCheckBox = QCheckBox('>=')
+        self.greaterThanEqualCheckBox.setChecked(False)
+        self.greaterThanEqualCheckBox.setStyleSheet(self.checkboxStyle)
+        self.equalCheckBox = QCheckBox('=')
+        self.equalCheckBox.setChecked(False)
+        self.equalCheckBox.setStyleSheet(self.checkboxStyle)
+              
+        # add line edit for conditional analysis
+        self.conditionalAnalysisTextBox = QLineEdit()
+        self.conditionalAnalysisTextBox.setPlaceholderText('Enter Number')
+        self.conditionalAnalysisTextBox.setStyleSheet(self.lineEditStyle)
+        self.conditionalAnalysisTextBox.setValidator(QtGui.QDoubleValidator().setNotation(QtGui.QDoubleValidator.Notation.StandardNotation))
+        
+        self.conditionalAnalysisLayout = QVBoxLayout()
+        self.conditionalAnalysisLayout.addWidget(self.conditionalAnalysisTextBox)
+        self.conditionalAnalysisLayout.addWidget(self.lessThanCheckBox)
+        self.conditionalAnalysisLayout.addWidget(self.greaterThanCheckBox)
+        self.conditionalAnalysisLayout.addWidget(self.lessThanEqualCheckBox)
+        self.conditionalAnalysisLayout.addWidget(self.greaterThanEqualCheckBox)
+        self.conditionalAnalysisLayout.addWidget(self.equalCheckBox)
+        self.conditionalAnalysisWidget.setLayout(self.conditionalAnalysisLayout)
+        self.conditionalAnalysisWidget.setWindowIcon(QtGui.QIcon('icon.ico'))
+        
+        
 
 
 
@@ -1232,6 +1276,7 @@ class Window(QWidget):
             self.mathCalculationWidget.close()
             self.filterWidget.close()
             self.reviewNoteWidget.close()
+            self.conditionalAnalysisWidget.close()
         if event.key() == Qt.Key.Key_Y:
             self.yAxisTwinxCheckBox.setChecked(True)
         if event.key() == Qt.Key.Key_D:
