@@ -411,25 +411,36 @@ class Window(QWidget):
         self.lessThanCheckBox = QCheckBox('<')
         self.lessThanCheckBox.setChecked(False)
         self.lessThanCheckBox.setStyleSheet(self.checkboxStyle)
+        self.lessThanCheckBox.stateChanged.connect(self.uncheckOthers)
+
         self.greaterThanCheckBox = QCheckBox('>')
         self.greaterThanCheckBox.setChecked(False)
         self.greaterThanCheckBox.setStyleSheet(self.checkboxStyle)
+        self.greaterThanCheckBox.stateChanged.connect(self.uncheckOthers)
+
         self.lessThanEqualCheckBox = QCheckBox('<=')
         self.lessThanEqualCheckBox.setChecked(False)
         self.lessThanEqualCheckBox.setStyleSheet(self.checkboxStyle)
+        self.lessThanEqualCheckBox.stateChanged.connect(self.uncheckOthers)
+
         self.greaterThanEqualCheckBox = QCheckBox('>=')
         self.greaterThanEqualCheckBox.setChecked(False)
         self.greaterThanEqualCheckBox.setStyleSheet(self.checkboxStyle)
+        self.greaterThanEqualCheckBox.stateChanged.connect(self.uncheckOthers)
+
         self.equalCheckBox = QCheckBox('=')
         self.equalCheckBox.setChecked(False)
         self.equalCheckBox.setStyleSheet(self.checkboxStyle)
-              
-        # add line edit for conditional analysis
+        self.equalCheckBox.stateChanged.connect(self.uncheckOthers)
+
+        # number textbox for conditional analysis
         self.conditionalAnalysisTextBox = QLineEdit()
         self.conditionalAnalysisTextBox.setPlaceholderText('Enter Number')
         self.conditionalAnalysisTextBox.setStyleSheet(self.lineEditStyle)
         self.conditionalAnalysisTextBox.setValidator(QtGui.QDoubleValidator().setNotation(QtGui.QDoubleValidator.Notation.StandardNotation))
         
+
+        # Layout ayarı
         self.conditionalAnalysisLayout = QVBoxLayout()
         self.conditionalAnalysisLayout.addWidget(self.conditionalAnalysisTextBox)
         self.conditionalAnalysisLayout.addWidget(self.lessThanCheckBox)
@@ -437,9 +448,25 @@ class Window(QWidget):
         self.conditionalAnalysisLayout.addWidget(self.lessThanEqualCheckBox)
         self.conditionalAnalysisLayout.addWidget(self.greaterThanEqualCheckBox)
         self.conditionalAnalysisLayout.addWidget(self.equalCheckBox)
+
         self.conditionalAnalysisWidget.setLayout(self.conditionalAnalysisLayout)
         self.conditionalAnalysisWidget.setWindowIcon(QtGui.QIcon('icon.ico'))
         
+
+    def uncheckOthers(self, state):
+        sender = self.sender()
+        checkboxes = [
+            self.lessThanCheckBox,
+            self.greaterThanCheckBox,
+            self.lessThanEqualCheckBox,
+            self.greaterThanEqualCheckBox,
+            self.equalCheckBox
+        ]
+
+        if state == 2: 
+            for checkbox in checkboxes:
+                if checkbox != sender:
+                    checkbox.setChecked(False)
 
     def search(self):
         search_text = self.searchField.text()
@@ -574,6 +601,7 @@ class Window(QWidget):
 
             # change window size
             self.resize(500, 650)
+            self.conditionalAnalysisWidget.move(810, 30)
 
             button_count = 0
 
@@ -1224,7 +1252,109 @@ class Window(QWidget):
                     # set column header name as line name
                     self.table.setHorizontalHeaderItem(
                         self.tableColumnCounter, QTableWidgetItem(self.label_name))
+        
+        if self.conditionalAnalysisTextBox.text() != '' and not self.lessThanCheckBox.isChecked() and not self.greaterThanCheckBox.isChecked() and not self.lessThanEqualCheckBox.isChecked() and not self.greaterThanEqualCheckBox.isChecked() and not self.equalCheckBox.isChecked():
+            msg = QMessageBox()
+            msg.setText(
+                "If you want to use conditional analysis, you must check one of the checkbox!")
+            msg.setWindowTitle("Error")
+            msg.setIcon(QMessageBox.Icon.Warning)
+            msg.exec()
+          
+        if self.conditionalAnalysisTextBox.text() != '' and (self.lessThanCheckBox.isChecked() or self.greaterThanCheckBox.isChecked() or self.lessThanEqualCheckBox.isChecked() or self.greaterThanEqualCheckBox.isChecked() or self.equalCheckBox.isChecked()):
+            
+            # get number from line edit
+            number = self.conditionalAnalysisTextBox.text()
+            number = number.replace(',', '.')
+            
+            if number.isdigit():
+                number = int(number)
+            else:
+                number = float(number)
+            
+            conditionalData = []
 
+            # check checkbox is checked or not
+            if self.lessThanCheckBox.isChecked():
+                for i in range(len(data)):
+                    if data[i] < number:
+                        conditionalData.append(data[i])
+                msg = QMessageBox()
+                msg.setText(
+                    f"Detected {len(conditionalData)} data is less than {number}")
+                msg.setWindowTitle("Conditional Analysis")
+                msg.setIcon(QMessageBox.Icon.Information)
+                msg.exec()
+                        
+            elif self.greaterThanCheckBox.isChecked():
+                for i in range(len(data)):
+                    if data[i] > number:
+                        conditionalData.append(data[i])
+                msg = QMessageBox()
+                msg.setText(
+                    f"Detected {len(conditionalData)} data is greater than {number}")
+                msg.setWindowTitle("Conditional Analysis")
+                msg.setIcon(QMessageBox.Icon.Information)
+                msg.exec()
+                    
+            elif self.lessThanEqualCheckBox.isChecked():
+                for i in range(len(data)):
+                    if data[i] <= number:
+                        conditionalData.append(data[i])
+                msg = QMessageBox()
+                msg.setText(
+                    f"Detected {len(conditionalData)} data is less than or equal to {number}")
+                msg.setWindowTitle("Conditional Analysis")
+                msg.setIcon(QMessageBox.Icon.Information)
+                msg.exec()
+                    
+            elif self.greaterThanEqualCheckBox.isChecked():
+                for i in range(len(data)):
+                    if data[i] >= number:
+                        conditionalData.append(data[i])
+                msg = QMessageBox()
+                msg.setText(
+                    f"Detected {len(conditionalData)} data is greater than or equal to {number}")
+                msg.setWindowTitle("Conditional Analysis")
+                msg.setIcon(QMessageBox.Icon.Information)
+                msg.exec()
+                    
+            elif self.equalCheckBox.isChecked():
+                for i in range(len(data)):
+                    if data[i] == number:
+                        conditionalData.append(data[i])
+                msg = QMessageBox()
+                msg.setText(
+                    f"Detected {len(conditionalData)} data is equal to {number}")
+                msg.setWindowTitle("Conditional Analysis")
+                msg.setIcon(QMessageBox.Icon.Information)
+                msg.exec()
+                    
+
+            # new table for conditional analysis
+            self.rawDataWidget = QWidget()
+            self.rawDataWidget.setWindowTitle(
+                self.label_name + " Conditional Analysis")
+            self.rawDataWidget.resize(500, 500)
+            self.rawDataWidget.show()
+            self.layout = QVBoxLayout()
+            self.table = QTableWidget()
+            self.table.setColumnCount(1)
+            self.table.setRowCount(len(conditionalData))
+            
+            # add data to table
+            for i in range(len(conditionalData)):
+                self.table.setItem(i, 0, QTableWidgetItem(str(conditionalData[i])))
+            
+            # set table header
+            self.table.setHorizontalHeaderLabels([self.label_name])
+            self.layout.addWidget(self.table)
+            self.rawDataWidget.setLayout(self.layout)
+            
+            
+            
+                            
+        
         self.lineCounter += 1
 
     def fftCheckBoxChanged(self):
