@@ -460,6 +460,7 @@ class Window(QWidget):
         self.deltaThresholdDetectionCheckBox = QCheckBox('Delta Threshold Detection')
         self.deltaThresholdDetectionCheckBox.setChecked(False)
         self.deltaThresholdDetectionCheckBox.setStyleSheet(self.checkboxStyle)
+        self.deltaThresholdDetectionCheckBox.stateChanged.connect(self.uncheckOthers)
         
 
         # Layout ayarı
@@ -486,7 +487,8 @@ class Window(QWidget):
             self.greaterThanCheckBox,
             self.lessThanEqualCheckBox,
             self.greaterThanEqualCheckBox,
-            self.equalCheckBox
+            self.equalCheckBox,
+            self.deltaThresholdDetectionCheckBox
         ]
 
         if state == 2: 
@@ -1307,36 +1309,18 @@ class Window(QWidget):
                     if data[i] < number:
                         conditionalData.append(data[i])
                         sampleNumberData.append(i)
-                msg = QMessageBox()
-                msg.setText(
-                    f"Detected {len(conditionalData)} data is less than {number}")
-                msg.setWindowTitle("Conditional Analysis")
-                msg.setIcon(QMessageBox.Icon.Information)
-                msg.exec()
                         
             elif self.greaterThanCheckBox.isChecked():
                 for i in range(len(data)):
                     if data[i] > number:
                         conditionalData.append(data[i])
                         sampleNumberData.append(i)
-                msg = QMessageBox()
-                msg.setText(
-                    f"Detected {len(conditionalData)} data is greater than {number}")
-                msg.setWindowTitle("Conditional Analysis")
-                msg.setIcon(QMessageBox.Icon.Information)
-                msg.exec()
                     
             elif self.lessThanEqualCheckBox.isChecked():
                 for i in range(len(data)):
                     if data[i] <= number:
                         conditionalData.append(data[i])
                         sampleNumberData.append(i)
-                msg = QMessageBox()
-                msg.setText(
-                    f"Detected {len(conditionalData)} data is less than or equal to {number}")
-                msg.setWindowTitle("Conditional Analysis")
-                msg.setIcon(QMessageBox.Icon.Information)
-                msg.exec()
                     
             elif self.greaterThanEqualCheckBox.isChecked():
                 for i in range(len(data)):
@@ -1344,11 +1328,6 @@ class Window(QWidget):
                         conditionalData.append(data[i])
                         sampleNumberData.append(i)
                         msg = QMessageBox()
-                msg.setText(
-                    f"Detected {len(conditionalData)} data is greater than or equal to {number}")
-                msg.setWindowTitle("Conditional Analysis")
-                msg.setIcon(QMessageBox.Icon.Information)
-                msg.exec()
                     
             elif self.equalCheckBox.isChecked():
                 for i in range(len(data)):
