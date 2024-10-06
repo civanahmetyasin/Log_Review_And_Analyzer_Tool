@@ -1551,6 +1551,18 @@ class Window(QWidget):
                     msg.setIcon(QMessageBox.Icon.Warning)
                     msg.exec()
                     return
+            elif '0b' in number:
+                number = number.replace('0b', '')
+                if all(c in '01' for c in number):
+                    number = int(number, 2)  
+                else:
+                    msg = QMessageBox()
+                    msg.setText(
+                        "If you want to use programmer analysis, you must enter a valid binary number!")
+                    msg.setWindowTitle("Error")
+                    msg.setIcon(QMessageBox.Icon.Warning)
+                    msg.exec()
+                    return            
             else:
                 if number.isdigit():
                     number = int(number)  
