@@ -842,7 +842,6 @@ class Window(QWidget):
                 msg.exec()
                 return
 
-
         if not doesHaveFmode:
             for i in range(len(lines)):
                 if i != 0:
@@ -1034,7 +1033,6 @@ class Window(QWidget):
                     self.multipleTwoLineCheckBox.setChecked(False)
                     QMessageBox.about(self, "Error", "Multiple Line Error")
                     return
-
 
         if (self.movingAverageCheckBox.isChecked() and not self.movingAveragePeriod.text().isdigit()) or (self.movingAverageCheckBox.isChecked() and self.movingAveragePeriod.text() == ''):
             msg = QMessageBox()
