@@ -1552,6 +1552,7 @@ class Window(QWidget):
                     msg.exec()
                     return
             elif '0b' in number:
+                number = number.replace(' ', '')
                 number = number.replace('0b', '')
                 if all(c in '01' for c in number):
                     number = int(number, 2)  
