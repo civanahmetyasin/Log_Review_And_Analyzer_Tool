@@ -1555,6 +1555,14 @@ class Window(QWidget):
                 f.write(self.CppArrayData)
         
         QMessageBox.about(self, "Export as Cpp Array", "Exported as Cpp Array")
+    
+    def closeEvent(self, event):
+        # close all widgets
+        self.mathCalculationWidget.close()
+        self.filterWidget.close()
+        self.reviewNoteWidget.close()
+        self.conditionalAnalysisWidget.close()
+        event.accept()
         
 if __name__ == "__main__":
     app = QApplication(sys.argv)
