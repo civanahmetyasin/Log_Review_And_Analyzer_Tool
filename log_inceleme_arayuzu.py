@@ -14,6 +14,8 @@ from PyQt6.QtCore import Qt, pyqtSignal
 # cd C:\Users\aycivan\Desktop\Repositories\es_test_applications\CSV_Reader
 # python setup.py build_exe
 
+# pip install PyQt6 matplotlib numpy pyyaml
+
 
 def read_from_csv(file_name):
     with open(file_name, 'r') as f:
