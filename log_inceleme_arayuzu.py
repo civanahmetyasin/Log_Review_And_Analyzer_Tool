@@ -1596,9 +1596,6 @@ class Window(QWidget):
                     self.table.setItem(i, 1, QTableWidgetItem(str(data[i])))
                     self.table.setItem(i, 2, QTableWidgetItem(hex(int(bitwiseData[i]))))
                     self.table.setItem(i, 3, QTableWidgetItem(bin(int(bitwiseData[i]))))
-                    
-                    
-
                 
                 # add information lable for programmer analysis
                 self.programmerAnalysisLabel = QLabel()
@@ -1612,8 +1609,9 @@ class Window(QWidget):
                 self.layout.addWidget(self.programmerAnalysisAbout)
                 self.layout.addWidget(self.table)
                 self.rawDataWidget.setLayout(self.layout)
-            
-        
+                
+                # TODO: aynı anda birden fazla checkbox seçilirse enson seçileni al
+                # TODO: bitsel işlem sonucundna 0 gelen değerleri göstermeyecek eklenti yap
         
         self.lineCounter += 1
 
