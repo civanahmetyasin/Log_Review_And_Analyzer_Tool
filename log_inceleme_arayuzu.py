@@ -1398,17 +1398,22 @@ class Window(QWidget):
             
             deltaData = []
             sampleNumberData = []
+            calculatedDeltaData = []
 
             # jump first data            
             for i in range(1, len(data)):
 
                 if abs(data[i] - data[i-1]) > number:
+                    calculatedDeltaData.append(abs(data[i] - data[i-1]))
+                    calculatedDeltaData.append(abs(data[i] - data[i-1]))
+                    deltaData.append(data[i-1])
                     deltaData.append(data[i])
+                    sampleNumberData.append(i-1)
                     sampleNumberData.append(i)
             
             msg = QMessageBox()
             msg.setText(
-                f"Detected {len(deltaData)} data is greater than {number}")
+                f"Detected {(len(deltaData)/2)} data is greater than {number}")
             msg.setWindowTitle("Delta Threshold Detection")
             msg.setIcon(QMessageBox.Icon.Information)
             msg.exec()
@@ -1422,17 +1427,16 @@ class Window(QWidget):
                 self.rawDataWidget.show()
                 self.layout = QVBoxLayout()
                 self.table = QTableWidget()
-                self.table.setColumnCount(2)
+                self.table.setColumnCount(3)
                 self.table.setRowCount(len(deltaData))
-                self.table.setHorizontalHeaderLabels(['Sample Number', 'Delta Value'])
+                self.table.setHorizontalHeaderLabels(['Sample Number', 'Sample Value' + ' ' + self.label_name, 'Calculated Delta'])
                                     
                 # add data to table
                 for i in range(len(deltaData)):
-                    self.table.setItem(i, 1, QTableWidgetItem(str(sampleNumberData[i])))
-                    self.table.setItem(i, 0, QTableWidgetItem(str(deltaData[i])))
+                    self.table.setItem(i, 0, QTableWidgetItem(str(sampleNumberData[i])))
+                    self.table.setItem(i, 1, QTableWidgetItem(str(deltaData[i])))
+                    self.table.setItem(i, 2, QTableWidgetItem(f"{calculatedDeltaData[i]:.3f}"))
             
-                # set table header
-                self.table.setHorizontalHeaderLabels([self.label_name])
                 self.layout.addWidget(self.table)
                 self.rawDataWidget.setLayout(self.layout)                    
         
