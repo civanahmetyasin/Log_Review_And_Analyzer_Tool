@@ -50,6 +50,7 @@ class Window(QWidget):
         self.filterWidget = QWidget()
         self.reviewNoteWidget = QWidget()
         self.conditionalAnalysisWidget = QWidget()
+        self.programmerAnalysisWidget = QWidget()
     
 
         # read file path from yaml file
@@ -113,6 +114,7 @@ class Window(QWidget):
         self.mathMenu.addAction('Math Calculation', self.mathCalculationWidget.show)
         self.mathMenu.addAction('Filters', self.filterWidget.show)
         self.mathMenu.addAction('Conditional Analysis', self.conditionalAnalysisWidget.show)
+        self.mathMenu.addAction('Programmer Analysis', self.programmerAnalysisWidget.show)
 
         self.configMenu = self.menuBar.addMenu('Config')
         self.configMenu.setStyleSheet(menuStyle)
@@ -287,7 +289,12 @@ class Window(QWidget):
         self.conditionalAnalysisWidget.resize(250, 300)
         self.conditionalAnalysisWidget.move(610, 30)
         self.conditionalAnalysisWidget.show()
-    
+        
+        # add programmer analysis
+        self.programmerAnalysisWidget.setWindowTitle("Programmer Analysis")
+        self.programmerAnalysisWidget.resize(250, 100)
+        self.programmerAnalysisWidget.move(610, 375)
+        self.programmerAnalysisWidget.show()
         
         # add textbox for get number for math calculation
         self.mathCalculationTextBox = QLineEdit()
@@ -479,6 +486,56 @@ class Window(QWidget):
         self.conditionalAnalysisWidget.setLayout(self.conditionalAnalysisLayout)
         self.conditionalAnalysisWidget.setWindowIcon(QtGui.QIcon('icon.ico'))
         
+        # add "AND", "OR" checkbox for programmer analysis
+        self.andCheckBox = QCheckBox('AND')
+        self.andCheckBox.setChecked(False)
+        self.andCheckBox.setStyleSheet(self.checkboxStyle)
+        self.andCheckBox.stateChanged.connect(self.uncheckOthers)
+        
+        self.orCheckBox = QCheckBox('OR')
+        self.orCheckBox.setChecked(False)
+        self.orCheckBox.setStyleSheet(self.checkboxStyle)
+        self.orCheckBox.stateChanged.connect(self.uncheckOthers)
+        
+        # add separator line
+        self.line7 = QWidget()
+        self.line7.setFixedHeight(1)
+        self.line7.setStyleSheet("""
+                    background-color: black;
+                    color: black;
+                    border: none;
+                    padding: 3px;
+                    margin: 2px;
+                    """)
+        
+        # add "AND", "OR" checkbox for programmer analysis
+        self.programmerAnalysisTextBox = QLineEdit()
+        self.programmerAnalysisTextBox.setPlaceholderText('Enter Number For Programmer Analysis')
+        self.programmerAnalysisTextBox.setStyleSheet(self.lineEditStyle)
+        self.programmerAnalysisTextBox.setValidator(QtGui.QDoubleValidator().setNotation(QtGui.QDoubleValidator.Notation.StandardNotation))
+        
+        # add separator line
+        self.line8 = QWidget()
+        self.line8.setFixedHeight(1)
+        self.line8.setStyleSheet("""
+                    background-color: black;
+                    color: black;
+                    border: none;
+                    padding: 3px;
+                    margin: 2px;
+                    """)
+        
+        # add "AND", "OR" checkbox for programmer analysis
+        self.programmerAnalysisLayout = QVBoxLayout()
+        self.programmerAnalysisLayout.addWidget(self.programmerAnalysisTextBox)
+        self.programmerAnalysisLayout.addWidget(self.andCheckBox)
+        self.programmerAnalysisLayout.addWidget(self.orCheckBox)
+        self.programmerAnalysisLayout.addWidget(self.line8)
+        
+        self.programmerAnalysisWidget.setLayout(self.programmerAnalysisLayout)
+        self.programmerAnalysisWidget.setWindowIcon(QtGui.QIcon('icon.ico'))
+        
+        
 
     def uncheckOthers(self, state):
         sender = self.sender()
@@ -630,6 +687,7 @@ class Window(QWidget):
             # change window size
             self.resize(500, 650)
             self.conditionalAnalysisWidget.move(810, 30)
+            self.programmerAnalysisWidget.move(810, 375)
 
             button_count = 0
 
@@ -1508,6 +1566,8 @@ class Window(QWidget):
             self.filterWidget.close()
             self.reviewNoteWidget.close()
             self.conditionalAnalysisWidget.close()
+            self.rawDataWidget.close()
+            self.programmerAnalysisWidget.close()
         if event.key() == Qt.Key.Key_Y:
             self.yAxisTwinxCheckBox.setChecked(True)
         if event.key() == Qt.Key.Key_D:
@@ -1576,6 +1636,8 @@ class Window(QWidget):
         self.filterWidget.close()
         self.reviewNoteWidget.close()
         self.conditionalAnalysisWidget.close()
+        self.rawDataWidget.close()
+        self.programmerAnalysisWidget.close()
         event.accept()
     
     def delta_threshold_detection_about(self):
