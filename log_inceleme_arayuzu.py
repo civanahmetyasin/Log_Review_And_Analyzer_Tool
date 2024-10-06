@@ -1384,7 +1384,6 @@ class Window(QWidget):
             msg.setWindowTitle("Error")
             msg.setIcon(QMessageBox.Icon.Warning)
             msg.exec()
-            
         
         if self.deltaThresholdDetectionCheckBox.isChecked() and self.deltaThresholdDetectionTextBox.text() != '':
             # get number from line edit
