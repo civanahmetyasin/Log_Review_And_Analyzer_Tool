@@ -112,6 +112,7 @@ class Window(QWidget):
         self.mathMenu.setStyleSheet(menuStyle)
         self.mathMenu.addAction('Math Calculation', self.mathCalculationWidget.show)
         self.mathMenu.addAction('Filters', self.filterWidget.show)
+        self.mathMenu.addAction('Conditional Analysis', self.conditionalAnalysisWidget.show)
 
         self.configMenu = self.menuBar.addMenu('Config')
         self.configMenu.setStyleSheet(menuStyle)
@@ -439,11 +440,6 @@ class Window(QWidget):
         self.conditionalAnalysisWidget.setLayout(self.conditionalAnalysisLayout)
         self.conditionalAnalysisWidget.setWindowIcon(QtGui.QIcon('icon.ico'))
         
-        
-
-
-
-
 
     def search(self):
         search_text = self.searchField.text()
