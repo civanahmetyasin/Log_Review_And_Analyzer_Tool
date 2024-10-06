@@ -1,6 +1,6 @@
 # read csv file
 from PyQt6 import QtGui
-from PyQt6.QtWidgets import QFileDialog, QAbstractItemView, QHeaderView, QWidget, QApplication, QMessageBox, QLineEdit, QPushButton, QVBoxLayout, QScrollArea, QCheckBox, QTableWidget, QTableWidgetItem, QMenuBar, QInputDialog
+from PyQt6.QtWidgets import QFileDialog, QAbstractItemView, QHeaderView, QWidget, QApplication, QMessageBox, QLineEdit, QPushButton, QVBoxLayout, QScrollArea, QCheckBox, QTableWidget, QTableWidgetItem, QMenuBar, QInputDialog, QLabel
 import matplotlib.pyplot as plt
 import os
 import sys
@@ -1416,14 +1416,7 @@ class Window(QWidget):
                     deltaData.append(data[i])
                     sampleNumberData.append(i-1)
                     sampleNumberData.append(i)
-            
-            msg = QMessageBox()
-            msg.setText(
-                f"Detected {(len(deltaData)/2)} data is greater than {number}")
-            msg.setWindowTitle("Delta Threshold Detection")
-            msg.setIcon(QMessageBox.Icon.Information)
-            msg.exec()
-            
+                       
             if len(deltaData) > 0 and len(sampleNumberData) > 0 :
                 # new table for delta threshold detection
                 self.rawDataWidget = QWidget()
@@ -1442,7 +1435,33 @@ class Window(QWidget):
                     self.table.setItem(i, 0, QTableWidgetItem(str(sampleNumberData[i])))
                     self.table.setItem(i, 1, QTableWidgetItem(str(deltaData[i])))
                     self.table.setItem(i, 2, QTableWidgetItem(f"{calculatedDeltaData[i]:.3f}"))
-            
+                    
+                # add information lable for delta threshold detection
+                self.deltaThresholdDetectionLabel = QLabel()
+                self.deltaThresholdDetectionLabel.setText(f"Detected {int(len(deltaData)/2)} data is greater than {number}")
+                
+                # add max delta value to table
+                self.maxDeltaValue = QLabel()
+                self.maxDeltaValue.setText(f"Max Delta Value: {max(calculatedDeltaData):.3f}" + ', ' + 'Sample Number: ' + str(sampleNumberData[calculatedDeltaData.index(max(calculatedDeltaData))]))
+                
+                # add min delta value to table
+                self.minDeltaValue = QLabel()
+                self.minDeltaValue.setText(f"Min Delta Value: {min(calculatedDeltaData):.3f}" + ', ' + 'Sample Number: ' + str(sampleNumberData[calculatedDeltaData.index(min(calculatedDeltaData))]))
+                
+                # add mean delta value to table
+                self.meanDeltaValue = QLabel()
+                self.meanDeltaValue.setText(f"Mean Delta Value: {np.mean(calculatedDeltaData):.3f}")
+                
+                # add about button for delta threshold detection
+                self.deltaThresholdDetectionAbout = QPushButton("About")
+                self.deltaThresholdDetectionAbout.clicked.connect(self.delta_threshold_detection_about)
+
+                
+                self.layout.addWidget(self.deltaThresholdDetectionLabel)
+                self.layout.addWidget(self.maxDeltaValue)
+                self.layout.addWidget(self.minDeltaValue)
+                self.layout.addWidget(self.meanDeltaValue)                
+                self.layout.addWidget(self.deltaThresholdDetectionAbout)
                 self.layout.addWidget(self.table)
                 self.rawDataWidget.setLayout(self.layout)                    
         
@@ -1563,6 +1582,20 @@ class Window(QWidget):
         self.reviewNoteWidget.close()
         self.conditionalAnalysisWidget.close()
         event.accept()
+    
+    def delta_threshold_detection_about(self):
+        # show about message box for delta threshold detection
+        msg = QMessageBox()
+        msg.setText(
+            "Delta Threshold Detection is a method that detects the difference between two consecutive data and compares it with the entered threshold value. If the difference is greater than the threshold value, the data is detected."
+            "\n\n Sample Number: Detected sample number, i and i-1"
+            "\n Sample Value: Detected sample value, data[i] and data[i-1]"
+            "\n Calculated Delta: Calculated difference between two consecutive data, abs(data[i] - data[i-1])"
+            "\n\n Formula: abs(data[i] - data[i-1]) > threshold")
+        
+        msg.setWindowTitle("Delta Threshold Detection")
+        msg.setIcon(QMessageBox.Icon.Information)
+        msg.exec() 
         
 if __name__ == "__main__":
     app = QApplication(sys.argv)
