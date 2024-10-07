@@ -1628,6 +1628,7 @@ class Window(QWidget):
                 self.programmerAnalysisAbout.clicked.connect(self.programmer_analysis_about)
 
                 self.programmerAnalysisFilterButton = QPushButton("Filter Zero Value")
+                self.programmerAnalysisFilterButton.clicked.connect(self.filter_zero_value)
 
                 self.layout.addWidget(self.programmerAnalysisLabel)
                 self.layout.addWidget(self.programmerAnalysisAbout)
@@ -1797,6 +1798,18 @@ class Window(QWidget):
         msg.setWindowTitle("Programmer Analysis")
         msg.setIcon(QMessageBox.Icon.Information)
         msg.exec()
+
+    def filter_zero_value(self):
+
+        # filter zero value from table
+
+                    
+
+                
+
+            
+
+
                
 if __name__ == "__main__":
     app = QApplication(sys.argv)
