@@ -1527,6 +1527,13 @@ class Window(QWidget):
                 self.layout.addWidget(self.deltaThresholdDetectionAbout)
                 self.layout.addWidget(self.table)
                 self.rawDataWidget.setLayout(self.layout)                    
+            else:
+                msg = QMessageBox()
+                msg.setText(
+                    "There is no Delta Threshold")
+                msg.setWindowTitle("Info")
+                msg.setIcon(QMessageBox.Icon.Warning)
+                msg.exec()
         
         if self.programmerAnalysisTextBox.text() == '' and self.andCheckBox.isChecked() and self.orCheckBox.isChecked():
             msg = QMessageBox()
@@ -1619,11 +1626,15 @@ class Window(QWidget):
                 # add about button for programmer analysis
                 self.programmerAnalysisAbout = QPushButton("About")
                 self.programmerAnalysisAbout.clicked.connect(self.programmer_analysis_about)
-                
+
+                self.programmerAnalysisFilterButton = QPushButton("Filter Zero Value")
+
                 self.layout.addWidget(self.programmerAnalysisLabel)
                 self.layout.addWidget(self.programmerAnalysisAbout)
+                self.layout.addWidget(self.programmerAnalysisFilterButton)
                 self.layout.addWidget(self.table)
                 self.rawDataWidget.setLayout(self.layout)
+                
         
         self.lineCounter += 1
 
