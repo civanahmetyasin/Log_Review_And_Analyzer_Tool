@@ -42,6 +42,18 @@ class Window(QWidget):
         super().__init__()
         self.init_ui()
 
+        # Load slipLineCharacter from YAML file or set default
+        self.slipLineCharacter = ';'
+        config_path = 'CSV_reader_Config/slipLineCharacter.yaml'
+        if os.path.exists(config_path):
+            with open(config_path, 'r') as f:
+                try:
+                    config = yaml.load(f, Loader=yaml.FullLoader)
+                    if 'slipLineCharacter' in config:
+                        self.slipLineCharacter = config['slipLineCharacter']
+                except yaml.YAMLError:
+                    pass
+
     def init_ui(self):
 
         self.slipLineCharacter = ';'
@@ -599,15 +611,61 @@ class Window(QWidget):
      
     def setSeparator(self):
         # q message box get data
-        self.separator = self.slipLineCharacter
-        self.separator, okPressed = QInputDialog.getText(
-            self, "Set Separator", "Separator:" , QLineEdit.EchoMode.Normal, self.slipLineCharacter)
-        
-        if okPressed and self.separator != '':
-            self.slipLineCharacter = self.separator
+        separator, okPressed = QInputDialog.getText(
+            self, "Set Separator", "Separator:", QLineEdit.EchoMode.Normal, self.slipLineCharacter)
+
+        if okPressed and separator != '':
+            self.slipLineCharacter = separator
+
+            # Save slipLineCharacter to YAML file
+            config_path = 'CSV_reader_Config/slipLineCharacter.yaml'
+            directory = os.path.dirname(config_path)
+            if not os.path.exists(directory):
+                os.makedirs(directory)
+
+            with open(config_path, 'w') as f:
+                yaml.dump({'slipLineCharacter': self.slipLineCharacter}, f)
 
 
     def read_csv(self):
+        # clear all old data
+        self.lines = []
+        self.titlesFromCSVFile = []
+        self.CSV_file_name = ''
+        self.selectedPath = ''
+        self.searchField.setText('')
+        self.searchField.setDisabled(True)
+        self.startPoint.setText('')
+        self.endPoint.setText('')
+        self.startEndPointCheckBox.setChecked(False)
+        self.drawOnTheSameGraphCheckBox.setChecked(False)
+        self.yAxisTwinxCheckBox.setChecked(False)
+        self.fftCheckBox.setChecked(False)
+        self.fftFrequency.setText('')
+        self.openRawData.setChecked(False)
+        self.meanCheckBox.setChecked(False)
+        self.movingAverageCheckBox.setChecked(False)
+        self.movingAveragePeriod.setText('')
+        self.conditionalAnalysisTextBox.setText('')
+        self.lessThanCheckBox.setChecked(False)
+        self.greaterThanCheckBox.setChecked(False)
+        self.lessThanEqualCheckBox.setChecked(False)
+        self.greaterThanEqualCheckBox.setChecked(False)
+        self.equalCheckBox.setChecked(False)
+        self.deltaThresholdDetectionTextBox.setText('')
+        self.deltaThresholdDetectionCheckBox.setChecked(False)
+        self.andCheckBox.setChecked(False)
+        self.orCheckBox.setChecked(False)
+        self.programmerAnalysisTextBox.setText('')
+        self.multipleLineLabel.setText('')
+        self.multipleTwoLineCheckBox.setChecked(False)
+        self.mathCalculationTextBox.setText('')
+        self.plusCheckBox.setChecked(False)
+        self.minusCheckBox.setChecked(False)
+        self.multiplyCheckBox.setChecked(False)
+        self.divideCheckBox.setChecked(False)
+        
+
         
         # clear table   
         self.reviewNoteRichtextBox.clearContents()
@@ -764,8 +822,12 @@ class Window(QWidget):
                         review_note = yaml.load(f, Loader=yaml.FullLoader)
                         for key, value in review_note.items():
                             self.reviewNoteRichtextBox.setItem(key, 0, QTableWidgetItem(value))
-                                            
-                
+
+            if len(self.titlesFromCSVFile) == 0:
+                self.resize(300, 300)
+                self.searchField.setDisabled(True)
+                QMessageBox.warning(self, 'Error', 'No data found in CSV file')
+
 
         else:
             # change window size
@@ -1104,6 +1166,11 @@ class Window(QWidget):
             self.movingAverageCheckBox.setChecked(False)
 
         if (self.drawOnTheSameGraphCheckBox.isChecked() or self.same_graph) and (self.lineCounter >= 1 and lineName == self.sender().text()):
+            # data check if data is empty
+            if len(data) == 0:
+                QMessageBox.about(self, "Error", "Data is empty")
+                return
+            
             if self.yAxisTwinxCheckBox.isChecked():
                 self.ax2 = self.ax.twinx()
                 self.OnTheSameGraphCounter += 1
@@ -1131,8 +1198,8 @@ class Window(QWidget):
                     moving_average_data = np.convolve(data, np.ones(int(self.movingAveragePeriod.text()))/int(self.movingAveragePeriod.text()), mode='valid')
                     movingAverageLabel = self.label_name + ' Moving Average' + ', Period: ' + self.movingAveragePeriod.text()
                     try:
-                        self.ax.plot(moving_average_data, label=movingAverageLabel ,
-                                  linestyle='--', color='black')
+                        self.ax2.plot(moving_average_data, label=movingAverageLabel,
+                                  linestyle='--', color='black')                        
                     except:
                         QMessageBox.about(self, "Error", "Moving Average Error")
 
@@ -1145,7 +1212,7 @@ class Window(QWidget):
                 self.ax2.legend(loc='upper right')
             else:
                 self.OnTheSameGraphCounter += 1
-
+                
                 self.ax.plot(data, label=self.label_name, linewidth=1, color=self.colors[self.lineCounter % len(self.colors)])
 
                 if self.meanCheckBox.isChecked():
@@ -1181,6 +1248,10 @@ class Window(QWidget):
             self.titleList.append(title)
 
         else:
+            if len(data) == 0:
+                QMessageBox.about(self, "Error", "Data is empty")
+                return
+            
             if lineName == self.sender().text():
                 self.OnTheSameGraphCounter = 0
                 self.twinGraphCounter = 0
@@ -1800,7 +1871,7 @@ class Window(QWidget):
         msg.exec()
 
     def filter_zero_value(self):
-
+        pass
         # filter zero value from table
 
                     
