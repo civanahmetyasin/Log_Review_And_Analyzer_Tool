@@ -72,7 +72,7 @@ class Window(QWidget):
         
         self.selectedPath = ''
                 
-        self.version = "6.0.0"
+        self.version = "8.0.0"
         self.CppArrayData = ""
 
         self.setWindowTitle('CSV Reader V' + self.version)
