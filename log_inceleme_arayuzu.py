@@ -1,6 +1,7 @@
 # read csv file
 from PyQt6 import QtGui
 from PyQt6.QtWidgets import QFileDialog, QAbstractItemView, QHeaderView, QWidget, QApplication, QMessageBox, QLineEdit, QPushButton, QVBoxLayout, QScrollArea, QCheckBox, QTableWidget, QTableWidgetItem, QMenuBar, QInputDialog, QLabel
+import categorical
 import matplotlib.pyplot as plt
 import os
 import sys
@@ -600,7 +601,7 @@ class Window(QWidget):
                           "CSV Reader " + self.version + "\n\nAuthor: Ahmet Yasin CIVAN \n\nContact: civan.ahmetyasin@gmail.com \n\nDate: 2021-06-07 \n\nVersion: " + self.version + "\n\nDescription: This application reads csv file and draws graph with matplotlib \n\nGithub: link \n\nLicense: MIT License \n\n")
         
     def thanks(self):
-        QMessageBox.about(self, "Thanks", "\n\nThanks to my friends for their support \n\nYunus AS \n\nMert Serhat SARIHAN \n\nEtka GÖKBEL \n\nÖmer KIVRAK \n\n")
+        QMessageBox.about(self, "Thanks", "\n\nThanks to my friends for their support \n\nYunus AS \n\nMert Serhat SARIHAN \n\nEtka GÖKBEL \n\nÖmer KIVRAK \n\nOrkhan AFANDI\n\n")
         
     def help(self):
         QMessageBox.about(self, "Help", " if mouse right click on the title, draw on the same graph\n\n if you want to see FFT graph, you must enter sample rate\n\n if you want to see mean value on the graph, you must check mean on checkbox\n\n if you want to open raw data in table, you must check open raw data in table checkbox\n\n if you want to use start and end point, you must check use start and end point checkbox\n\n if you want to use math calculation, you must enter number and check + - * / checkbox")
@@ -1168,8 +1169,11 @@ class Window(QWidget):
         if (self.drawOnTheSameGraphCheckBox.isChecked() or self.same_graph) and (self.lineCounter >= 1 and lineName == self.sender().text()):
             # data check if data is empty
             if len(data) == 0:
-                QMessageBox.about(self, "Error", "Data is empty")
-                return
+                if categorical.handle_non_numeric_data(self, lines, column, lineName, self.slipLineCharacter):
+                    return
+                else:
+                    QMessageBox.about(self, "Error", "Data is empty")
+                    return
             
             if self.yAxisTwinxCheckBox.isChecked():
                 self.ax2 = self.ax.twinx()
@@ -1249,8 +1253,11 @@ class Window(QWidget):
 
         else:
             if len(data) == 0:
-                QMessageBox.about(self, "Error", "Data is empty")
-                return
+                if categorical.handle_non_numeric_data(self, lines, column, lineName, self.slipLineCharacter):
+                    return
+                else:
+                    QMessageBox.about(self, "Error", "Data is empty")
+                    return
             
             if lineName == self.sender().text():
                 self.OnTheSameGraphCounter = 0
@@ -1343,19 +1350,6 @@ class Window(QWidget):
                 self.rawDataWidget.show()
                 self.layout = QVBoxLayout()
                 
-                self.exportButton = QPushButton( self.label_name + ' ' + 'Export as Cpp Array' )
-                
-                # print to console as uint16_t c array without .0
-                self.CppArrayData = "uint16_t " + self.label_name + "[] = {"
-                for i in range(len(data)):
-                    if i == len(data)-1:
-                        self.CppArrayData = self.CppArrayData + str(int(data[i]))
-                    else:
-                        self.CppArrayData = self.CppArrayData + str(int(data[i])) + ", "
-                self.CppArrayData = self.CppArrayData + "};"
-
-                self.exportButton.clicked.connect(self.export_as_cpp_array)
-                self.layout.addWidget(self.exportButton)
 
                 self.table = QTableWidget()
 
